@@ -1,0 +1,7 @@
+name: presheaves
+depend:
+  -- agda-2.6.2.2
+  standard-library-2.0
+  frames
+include :
+  src

@@ -1,14 +1,14 @@
 {-# OPTIONS --safe --without-K #-}
 
 open import Kripke.IFrame
-import Kripke.DFrame as KDF
+import Kripke.FDFrame as FDF
 
 module Presheaf.Functor.Lax
   {W    : Set}
   {_⊆_  : (w w' : W) → Set}
   {IF   : IFrame W _⊆_}
   {_R_  : (w v : W) → Set}
-  (let open KDF IF _R_)
+  (let open FDF IF _R_)
   (DF   : DFrame)
   where
 

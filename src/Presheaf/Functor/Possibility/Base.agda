@@ -3,7 +3,7 @@
 open import Kripke.IFrame
 import Kripke.DFrame as KDF
 
-module Presheaf.Possibility.Base
+module Presheaf.Functor.Possibility.Base
   {W    : Set}
   {_⊆_  : (Γ Δ : W) → Set}
   {IF   : IFrame W _⊆_}

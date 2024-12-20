@@ -3,7 +3,7 @@
 open import Kripke.IFrame
 import Kripke.DFrame as KDF
 
-module Presheaf.Lax
+module Presheaf.Functor.Lax
   {W    : Set}
   {_⊆_  : (w w' : W) → Set}
   {IF   : IFrame W _⊆_}
@@ -16,7 +16,7 @@ open DFrame DF
 
 open import Presheaf.Base IF
 open import Presheaf.CartesianClosure IF
-open import Presheaf.Possibility.Base DF public
+open import Presheaf.Functor.Possibility.Base DF public
 
 open import Relation.Binary.PropositionalEquality
   using (_≡_; subst; cong; cong₂)

@@ -4,7 +4,7 @@ open import Kripke.IFrame
 
 module Presheaf.CartesianClosure
   {W   : Set}
-  {_⊆_ : (Γ Γ' : W) → Set}
+  {_⊆_ : (w w' : W) → Set}
   (IF  : IFrame W _⊆_)
   (let open IFrame IF)
   where
@@ -49,7 +49,8 @@ Unit' = record
   ; wk-pres-trans = λ _x _i _i' → ≡-refl
   }
 
-[]' = Unit'
+⊤' = Unit'
+1' = ⊤'
 
 unit' : ℛ →̇ Unit'
 unit' = record
@@ -63,7 +64,7 @@ unit'[_] = λ ℛ → unit' {ℛ}
 Unit'-eta : t ≈̇ unit'
 Unit'-eta {ℛ} {t} = record { proof = λ r → ⊤-eta (t .apply r) (unit'[ ℛ ] .apply r) }
 
-[]'-eta = Unit'-eta
+⊤'-eta = Unit'-eta
 
 module _ (𝒫 𝒬 : Psh) where
   open Psh 𝒫 using () renaming (Fam to P)

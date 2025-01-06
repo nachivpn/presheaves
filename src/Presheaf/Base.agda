@@ -8,7 +8,7 @@ open import Relation.Binary.PropositionalEquality
 
 module Presheaf.Base
   {W    : Set}
-  {_⊆_  : (Γ Γ' : W) → Set}
+  {_⊆_  : (w w' : W) → Set}
   (IF   : IFrame W _⊆_)
   where
 

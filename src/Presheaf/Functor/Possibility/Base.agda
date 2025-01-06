@@ -5,9 +5,9 @@ import Kripke.FDFrame as FDF
 
 module Presheaf.Functor.Possibility.Base
   {W    : Set}
-  {_⊆_  : (Γ Δ : W) → Set}
+  {_⊆_  : (w w' : W) → Set}
   {IF   : IFrame W _⊆_}
-  {_R_  : (Γ Δ : W) → Set}
+  {_R_  : (w v : W) → Set}
   (let open FDF IF _R_)
   (DF   : DFrame)
   where

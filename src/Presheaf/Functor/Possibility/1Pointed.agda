@@ -9,8 +9,9 @@ module Presheaf.Functor.Possibility.1Pointed
   {IF   : IFrame W _⊆_}
   {_R_  : (w v : W) → Set}
   (let open FDF IF _R_)
-  (DF   : DFrame)
-  (SDF  : SerialDFrame DF)
+  {DF   : DFrame}
+  (let open Definitions DF)
+  (SDF  : SerialDFrame)
   where
 
 open DFrame DF
@@ -20,10 +21,10 @@ open import Presheaf.Base IF
 open import Presheaf.CartesianClosure IF
 open import Presheaf.Functor.Possibility.Base DF
 
-open import Relation.Binary.PropositionalEquality using (_≡_ ; cong) renaming (refl to ≡-refl)
+open import Relation.Binary.PropositionalEquality using (_≡_ ; cong) renaming (refl to ≡-refl ; sym to ≡-sym)
 open import Data.Product using (_,_) renaming (proj₁ to fst ; proj₂ to snd)
 
-open import PUtil using (≡→Σ-≡,≡)
+open import PUtil using (Σ-≡,≡←≡)
 
 point₁ : ⊤' →̇ ◇ ⊤'
 point₁ = record
@@ -41,6 +42,5 @@ point₁ = record
     point₁-fun-pres-≋ x≋y = ≋[ ◇ ⊤' ]-refl
 
     point₁-fun-natural : Natural ⊤' (◇ ⊤') point₁-fun
-    point₁-fun-natural i _ with ≡→Σ-≡,≡ (factor-pres-R-serial i)
-    ... | (p , q) = proof (p , q , ≡-refl)
-
+    point₁-fun-natural i _ = let (p , q) = Σ-≡,≡←≡ (factor-pres-serial' i)
+      in proof (p , q , ≡-refl)

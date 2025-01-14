@@ -29,22 +29,6 @@ private
   variable
     𝒫 𝒫' 𝒬 𝒬' : Psh
 
-module Serial (SDF : SerialDFrame) where
-
-  open import Presheaf.Functor.Possibility.1Pointed SDF
-  
-  point[_] : (𝒫 : Psh) → 𝒫 →̇ ◇ 𝒫
-  point[ 𝒫 ] = ◇-map π₁' ∘ strength[ 𝒫 , ⊤' ] ∘ id' ×'-map point₁ ∘ pair' id' unit'
-
-  opaque
-    point-natural : (t : 𝒫 →̇ 𝒬) → point[ 𝒬 ] ∘ t ≈̇ ◇-map t ∘ point[ 𝒫 ]
-    point-natural {𝒫} {𝒬} t = record { proof = λ p → proof (≡-refl , ≡-refl , t .natural _ p) }
-
-    ◇-strong-point : strength[ 𝒫 , 𝒬 ]  ∘ id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]
-    ◇-strong-point {𝒫} {𝒬} = record { proof = λ _p → ≋[ ◇ (𝒫 ×' 𝒬) ]-refl }
-
-  point = λ {𝒫} → point[ 𝒫 ]
-
 module Reflexive (RDF : ReflexiveDFrame) (IRDF : InclusiveReflexiveDFrame IDF RDF) where
 
   open ReflexiveDFrame RDF

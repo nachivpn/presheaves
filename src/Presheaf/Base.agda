@@ -16,7 +16,7 @@ open IFrame IF
 
 open import Level using (0ℓ)
 open import Relation.Binary using (Reflexive; Symmetric; Transitive; IsEquivalence; Setoid)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; trans; subst; cong)
+open import Relation.Binary.PropositionalEquality.Properties using () renaming (isEquivalence to ≡-equiv)
 import Relation.Binary.Reasoning.Setoid as EqReasoning
 
 infixr 19 _∘_
@@ -53,7 +53,7 @@ record Psh : Set₁ where
     }
 
   wk-pres-≡-≋ : ∀ {i i' : w ⊆ v} (i≡i' : i ≡ i') {x y : Fam w} (x≋y : x ≋ y) → wk i x ≋ wk i' y
-  wk-pres-≡-≋ {i = i} {.i} refl = wk-pres-≋ i
+  wk-pres-≡-≋ {i = i} {.i} ≡-refl = wk-pres-≋ i
 
   module _ {w : W} where
     open IsEquivalence (≋-equiv w) public
@@ -66,7 +66,7 @@ record Psh : Set₁ where
         )
 
   ≋-reflexive˘ : ∀ {x y : Fam w} → y ≡ x → x ≋ y
-  ≋-reflexive˘ refl = ≋-refl
+  ≋-reflexive˘ ≡-refl = ≋-refl
 
 -- open Psh {{...}} using (_≋_; ≋-refl; ≋-sym; ≋-trans; wk) public
 -- ≋-refl  = λ {𝒫} {w} {p}         → 𝒫 .Psh.≋-refl {w} {p}
@@ -200,3 +200,14 @@ abstract
 
   ∘-unit-right : ∀ (𝒫 : Psh) {𝒬 : Psh} (φ : 𝒫 →̇ 𝒬) → φ ∘ id'[ 𝒫 ] ≈̇ φ
   ∘-unit-right _ {𝒬} _ = record { proof = λ p → ≋[ 𝒬 ]-refl }
+
+_⊆- : W → Psh
+w ⊆- = record
+        { Fam           = w ⊆_
+        ; _≋_           = _≡_
+        ; ≋-equiv       = λ _ → ≡-equiv
+        ; wk            = λ i i' → ⊆-trans i' i
+        ; wk-pres-≋     = λ i x≋y → cong₂ ⊆-trans x≋y ≡-refl
+        ; wk-pres-refl  = ⊆-trans-unit-right
+        ; wk-pres-trans = λ i' i'' i → ≡-sym (⊆-trans-assoc i i' i'')
+        }

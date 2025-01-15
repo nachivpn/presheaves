@@ -29,12 +29,26 @@ private
   variable
     𝒫 𝒫' 𝒬 𝒬' : Psh
 
+module Pointed (PDF : PointedDFrame) (IPDF : InclusivePointedDFrame IDF PDF) where
+
+  open PointedDFrame PDF
+  open InclusivePointedDFrame IPDF
+
+  open import Presheaf.Functor.Possibility.Pointed
+  open Pointed PDF
+
+  opaque
+    ◇-strong-point : strength[ 𝒫 , 𝒬 ] ∘ id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]
+    ◇-strong-point {𝒫} {𝒬} = record { proof = λ _ → proof (≡-refl , ≡-refl
+      , proof (wk[ 𝒫 ]-pres-≡-≋ R-to-⊆-pres-point ≋[ 𝒫 ]-refl , ≋[ 𝒬 ]-refl)) }
+
 module Reflexive (RDF : ReflexiveDFrame) (IRDF : InclusiveReflexiveDFrame IDF RDF) where
 
   open ReflexiveDFrame RDF
   open InclusiveReflexiveDFrame IRDF
 
-  open import Presheaf.Functor.Possibility.Pointed RDF
+  open import Presheaf.Functor.Possibility.Pointed
+  open Reflexive RDF
   
   opaque
     ◇-strong-point : strength[ 𝒫 , 𝒬 ] ∘ id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]

@@ -81,9 +81,10 @@ open Psh public
     ; ≋-sym         to ≋[_]-sym
     ; ≋-trans       to ≋[_]-trans
     ; ≋-reflexive   to ≋[_]-reflexive
-    ; ≋-reflexive˘   to ≋[_]-reflexive˘
+    ; ≋-reflexive˘  to ≋[_]-reflexive˘
     ; wk            to wk[_]
     ; wk-pres-≋     to wk[_]-pres-≋
+    ; wk-pres-≡-≋   to wk[_]-pres-≡-≋
     ; wk-pres-refl  to wk[_]-pres-refl
     ; wk-pres-trans to wk[_]-pres-trans
     )

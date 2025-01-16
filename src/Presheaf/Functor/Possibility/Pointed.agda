@@ -38,7 +38,7 @@ module Pointed (PDF : PointedDFrame) where
   copoint[ 𝒫 ] = record
     { fun     = λ bp → bp .apply R-point
     ; pres-≋  = λ bp≋bp' → bp≋bp' .apply-≋ R-point
-    ; natural = λ i bp → ≋[ 𝒫 ]-trans (bp .natural i R-point) (bp .apply-≋ (factor-pres-point i))
+    ; natural = λ i bp → ≋[ 𝒫 ]-trans (bp .natural i R-point) (bp .apply-≋ (factor-pres-R-point i))
     }
 
   copoint = λ {𝒫} → copoint[ 𝒫 ]

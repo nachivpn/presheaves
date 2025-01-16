@@ -34,36 +34,36 @@ module Pointed (PDF : PointedDFrame) where
 
   open PointedDFrame PDF
 
-  ε[_] : ∀ 𝒫 → ◼ 𝒫 →̇ 𝒫
-  ε[ 𝒫 ] = record
+  copoint[_] : ∀ 𝒫 → ◼ 𝒫 →̇ 𝒫
+  copoint[ 𝒫 ] = record
     { fun     = λ bp → bp .apply R-point
     ; pres-≋  = λ bp≋bp' → bp≋bp' .apply-≋ R-point
     ; natural = λ i bp → ≋[ 𝒫 ]-trans (bp .natural i R-point) (bp .apply-≋ (factor-pres-point i))
     }
 
-  ε = λ {𝒫} → ε[ 𝒫 ]
+  copoint = λ {𝒫} → copoint[ 𝒫 ]
 
   opaque
-    ε-natural : (t : 𝒫 →̇ 𝒬) → ε[ 𝒬 ] ∘ (◼-map t) ≈̇ t ∘ ε[ 𝒫 ]
-    ε-natural {𝒬 = 𝒬} t = record { proof = λ _bp → ≋[ 𝒬 ]-refl }
+    copoint-natural : (t : 𝒫 →̇ 𝒬) → copoint[ 𝒬 ] ∘ (◼-map t) ≈̇ t ∘ copoint[ 𝒫 ]
+    copoint-natural {𝒬 = 𝒬} t = record { proof = λ _bp → ≋[ 𝒬 ]-refl }
 
   point[_] : ∀ 𝒫 → 𝒫 →̇ ◇ 𝒫
-  point[ 𝒫 ] = ε[ ◇ 𝒫 ] ∘ η[ 𝒫 ]
+  point[ 𝒫 ] = copoint[ ◇ 𝒫 ] ∘ η[ 𝒫 ]
 
   opaque
     point-natural : (t : 𝒫 →̇ 𝒬) → point[ 𝒬 ] ∘ t ≈̇ ◇-map t ∘ point[ 𝒫 ]
     point-natural {𝒫} {𝒬} t = let open EqReasoning (→̇-setoid 𝒫 (◇ 𝒬)) in begin
-      (ε ∘ η) ∘ t
-        ≈⟨ ∘-assoc ε η t ⟩
-      ε ∘ (η ∘ t)
-        ≈⟨ ∘-pres-≈̇-right ε (η-natural t) ⟩
-      ε ∘ (◼-map (◇-map t) ∘ η)
-        ≈˘⟨ ∘-assoc ε (◼-map (◇-map t)) η ⟩
-      (ε ∘ ◼-map (◇-map t)) ∘ η
-        ≈⟨ ∘-pres-≈̇-left (ε-natural (◇-map t)) η ⟩
-      (◇-map t ∘ ε) ∘ η
-        ≈⟨ ∘-assoc (◇-map t) ε η ⟩
-      ◇-map t ∘ (ε ∘ η)
+      (copoint ∘ η) ∘ t
+        ≈⟨ ∘-assoc copoint η t ⟩
+      copoint ∘ (η ∘ t)
+        ≈⟨ ∘-pres-≈̇-right copoint (η-natural t) ⟩
+      copoint ∘ (◼-map (◇-map t) ∘ η)
+        ≈˘⟨ ∘-assoc copoint (◼-map (◇-map t)) η ⟩
+      (copoint ∘ ◼-map (◇-map t)) ∘ η
+        ≈⟨ ∘-pres-≈̇-left (copoint-natural (◇-map t)) η ⟩
+      (◇-map t ∘ copoint) ∘ η
+        ≈⟨ ∘-assoc (◇-map t) copoint η ⟩
+      ◇-map t ∘ (copoint ∘ η)
         ∎
 
   point = λ {𝒫} → point[ 𝒫 ]

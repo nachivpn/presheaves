@@ -65,9 +65,33 @@ module Joinable (JDF : JoinableDFrame) where
   join[ 𝒫 ] = squash[ ◇ 𝒫 ] ∘ ◇-map (◇-map η[ 𝒫 ])
 
   opaque
+    -- this is a low-level version that manually constructs a proof
+    -- since the generic proof below is much slower
     join-natural : (t :  𝒫 →̇  𝒬) → join[ 𝒬 ] ∘ ◇-map (◇-map t) ≈̇ ◇-map t ∘ join[ 𝒫 ]
     join-natural {𝒫} {𝒬} t = record { proof = λ _p → proof (≡-refl , ≡-refl , t .natural _ _) }
 
+    -- join-natural : (t : 𝒫 →̇ 𝒬) → join[ 𝒬 ] ∘ ◇-map (◇-map t) ≈̇ ◇-map t ∘ join[ 𝒫 ]
+    -- join-natural {𝒫} {𝒬} t = let open EqReasoning (→̇-setoid (◇ ◇ 𝒫) (◇ 𝒬)) in begin
+    --   (squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map η[ 𝒬 ])) ∘ ◇-map (◇-map t)
+    --     ≈⟨ ∘-assoc squash[ ◇ 𝒬 ] (◇-map (◇-map η[ 𝒬 ])) (◇-map (◇-map t)) ⟩
+    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map η[ 𝒬 ]) ∘ ◇-map (◇-map t)
+    --     ≈˘⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-∘ (◇-map η[ 𝒬 ]) (◇-map t)) ⟩
+    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map η[ 𝒬 ] ∘ ◇-map t)
+    --     ≈˘⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-≈̇ (◇-map-pres-∘ (η[ 𝒬 ]) t)) ⟩
+    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (η[ 𝒬 ] ∘ t))
+    --     ≈⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-≈̇ (◇-map-pres-≈̇ (η-natural t))) ⟩
+    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map (◇-map t) ∘ η[ 𝒫 ]))
+    --     ≈⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-≈̇ (◇-map-pres-∘ (◼-map (◇-map t)) η[ 𝒫 ])) ⟩
+    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map (◇-map t)) ∘ ◇-map η[ 𝒫 ])
+    --     ≈⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-∘ (◇-map (◼-map (◇-map t))) (◇-map η[ 𝒫 ])) ⟩
+    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map ◇-map t)) ∘ ◇-map (◇-map η[ 𝒫 ])
+    --     ≈˘⟨ ∘-assoc squash[ ◇ 𝒬 ] (◇-map (◇-map (◼-map ◇-map t))) (◇-map (◇-map η[ 𝒫 ])) ⟩
+    --   (squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map ◇-map t))) ∘ ◇-map (◇-map η[ 𝒫 ])
+    --     ≈˘⟨ ∘-pres-≈̇-left (squash-natural (◇-map t)) (◇-map (◇-map η[ 𝒫 ])) ⟩
+    --   (◇-map t ∘ squash[ ◇ 𝒫 ]) ∘ ◇-map (◇-map η[ 𝒫 ])
+    --     ≈⟨ ∘-assoc (◇-map t) squash[ ◇ 𝒫 ] (◇-map (◇-map η[ 𝒫 ])) ⟩
+    --   ◇-map t ∘ squash[ ◇ 𝒫 ] ∘ ◇-map (◇-map η[ 𝒫 ])
+    --     ∎
 
 module Transitive (TDF : TransitiveDFrame) where
 

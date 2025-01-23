@@ -58,7 +58,7 @@ opaque
 --
 
 -- Intuition: for all intuitionistic futures
-◻ᵢ : Psh → Psh
+◻ᵢ_ : Psh → Psh
 ◻ᵢ 𝒫 = record
   { Fam           = λ w → Hom (-⊇ w) 𝒫
   ; _≋_           = _≈̇_
@@ -87,7 +87,7 @@ opaque
   ◻ᵢ-map-pres-∘ {𝒫} {ℛ = ℛ} t' t = record { proof = ∘-assoc t' t }
 
 -- wk[_] with arguments flipped
-wk[_]' : (𝒫 : Psh) → 𝒫 →̇ ◻ᵢ 𝒫
+wk[_]' : ∀ 𝒫 → 𝒫 →̇ ◻ᵢ 𝒫
 wk[_]' 𝒫 = record
   { fun     = λ p → record
     { fun     = λ i → wk[ 𝒫 ] i p

@@ -116,6 +116,9 @@ record _→̇_ (𝒫 𝒬 : Psh) : Set where -- type \-> \^.
 
 open _→̇_ using (natural) renaming (fun to apply; pres-≋ to apply-≋) public
 
+Hom : Psh → Psh → Set
+Hom 𝒫 𝒬 = 𝒫 →̇ 𝒬
+
 record _≈̇_ (φ ψ : 𝒫 →̇ 𝒬) : Set where -- type \~~ \^.
   no-eta-equality
   field
@@ -202,13 +205,3 @@ abstract
   ∘-unit-right : ∀ (𝒫 : Psh) {𝒬 : Psh} (φ : 𝒫 →̇ 𝒬) → φ ∘ id'[ 𝒫 ] ≈̇ φ
   ∘-unit-right _ {𝒬} _ = record { proof = λ p → ≋[ 𝒬 ]-refl }
 
-_⊆- : W → Psh
-w ⊆- = record
-        { Fam           = w ⊆_
-        ; _≋_           = _≡_
-        ; ≋-equiv       = λ _ → ≡-equiv
-        ; wk            = λ i i' → ⊆-trans i' i
-        ; wk-pres-≋     = λ i x≋y → cong₂ ⊆-trans x≋y ≡-refl
-        ; wk-pres-refl  = ⊆-trans-unit-right
-        ; wk-pres-trans = λ i' i'' i → ≡-sym (⊆-trans-assoc i i' i'')
-        }

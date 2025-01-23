@@ -16,12 +16,13 @@ open DFrame DF
 
 open import Data.Product using (∃; _×_; _,_; -,_) renaming (proj₁ to fst; proj₂ to snd)
 
-open import Relation.Binary using (Reflexive; Symmetric; Transitive; IsEquivalence; Setoid)
-open import Relation.Binary.PropositionalEquality using (_≡_; subst; cong; cong₂) renaming (refl to ≡-refl; sym to ≡-sym; trans to ≡-trans)
+open import Relation.Binary.PropositionalEquality
+  using (_≡_; subst; cong; cong₂) renaming (refl to ≡-refl; sym to ≡-sym; trans to ≡-trans)
 import Relation.Binary.Reasoning.Setoid as EqReasoning
 
 open import Presheaf.Base IF
 open import Presheaf.Functor.Possibility.Base DF
+open import Presheaf.Functor.Possibility.Properties DF
 
 open import PUtil
 
@@ -42,28 +43,31 @@ module Joinable (JDF : JoinableDFrame) where
     }
     where
     squash-fun : ◇ (◇ (◼ 𝒫)) ₀ w → 𝒫 ₀ w
-    squash-fun (elem (u , r1 , (elem (v , r2 , bp)))) = bp .apply (R-join r1 r2)
+    squash-fun (elem (u , r1 , (elem (v , r2 , bp)))) = bp .apply (elem (R-join r1 r2))
 
     opaque
       squash-pres-≋ : Pres-≋ (◇ (◇ (◼ 𝒫))) 𝒫 squash-fun
-      squash-pres-≋ (proof (≡-refl , ≡-refl , (proof (≡-refl , ≡-refl , p≋p')))) = p≋p' .apply-≋ (R-join _ _)
+      squash-pres-≋ (proof (≡-refl , ≡-refl , (proof (≡-refl , ≡-refl , p≋p')))) = p≋p' .apply-≋ (elem (R-join _ _))
 
       squash-natural : Natural (◇ (◇ (◼ 𝒫))) 𝒫 squash-fun
-      squash-natural i (elem (_u , r1 , (elem (_v , r2 , bp)))) = ≋[ 𝒫 ]-trans (bp .natural i _) (bp .apply-≋ (factor-pres-R-join i r1 r2))
+      squash-natural i (elem (_u , r1 , (elem (_v , r2 , bp)))) = ≋[ 𝒫 ]-trans
+        (bp .natural i _)
+        (bp .apply-≋ (proof (Σ×-≡,≡,≡←≡ ((factor-pres-R-join i r1 r2)))))
 
   opaque
-    squash-natural : (t : 𝒫 →̇ 𝒬) → t ∘ squash[ 𝒫 ] ≈̇ squash[ 𝒬 ] ∘ (◇-map (◇-map (◼-map t)))
+    squash-natural : (t : 𝒫 →̇ 𝒬) → t ∘ squash[ 𝒫 ] ≈̇ squash[ 𝒬 ] ∘ ◇-map (◇-map (◼-map t))
     squash-natural {𝒫} {𝒬} t = record { proof = λ _p → ≋[ 𝒬 ]-refl }
 
-    squash-assoc : squash[ 𝒫 ] ∘ squash[ ◇ ◇ ◼ 𝒫 ] ≈̇ squash[ 𝒫 ] ∘ (◇-map (◇-map (◼-map squash[ 𝒫 ])))
+    squash-assoc : squash[ 𝒫 ] ∘ squash[ ◇ ◇ ◼ 𝒫 ] ≈̇ squash[ 𝒫 ] ∘ ◇-map (◇-map (◼-map squash[ 𝒫 ]))
     squash-assoc {𝒫} = squash-natural squash[ 𝒫 ]
 
   join[_] : ∀ 𝒫 → ◇ ◇ 𝒫 →̇ ◇ 𝒫
   join[ 𝒫 ] = squash[ ◇ 𝒫 ] ∘ ◇-map (◇-map η[ 𝒫 ])
 
   opaque
-    join-natural : (t :  𝒫 →̇  𝒬) → join[ 𝒬 ] ∘ (◇-map (◇-map t)) ≈̇ (◇-map t) ∘ join[ 𝒫 ]
+    join-natural : (t :  𝒫 →̇  𝒬) → join[ 𝒬 ] ∘ ◇-map (◇-map t) ≈̇ ◇-map t ∘ join[ 𝒫 ]
     join-natural {𝒫} {𝒬} t = record { proof = λ _p → proof (≡-refl , ≡-refl , t .natural _ _) }
+
 
 module Transitive (TDF : TransitiveDFrame) where
 

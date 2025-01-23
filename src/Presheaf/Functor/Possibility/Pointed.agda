@@ -18,6 +18,7 @@ open DFrame DF
 open import Presheaf.Base IF
 open import Presheaf.CartesianClosure IF
 open import Presheaf.Functor.Possibility.Base DF
+open import Presheaf.Functor.Possibility.Properties DF
 
 open import Relation.Binary.PropositionalEquality using (_≡_ ; cong) renaming (refl to ≡-refl ; sym to ≡-sym)
 import Relation.Binary.Reasoning.Setoid as EqReasoning
@@ -36,9 +37,11 @@ module Pointed (PDF : PointedDFrame) where
 
   copoint[_] : ∀ 𝒫 → ◼ 𝒫 →̇ 𝒫
   copoint[ 𝒫 ] = record
-    { fun     = λ bp → bp .apply R-point
-    ; pres-≋  = λ bp≋bp' → bp≋bp' .apply-≋ R-point
-    ; natural = λ i bp → ≋[ 𝒫 ]-trans (bp .natural i R-point) (bp .apply-≋ (factor-pres-R-point i))
+    { fun     = λ bp → bp .apply (elem R-point)
+    ; pres-≋  = λ bp≋bp' → bp≋bp' .apply-≋ (elem R-point)
+    ; natural = λ i bp → ≋[ 𝒫 ]-trans
+      (bp .natural i (elem R-point))
+      (bp .apply-≋ (proof (Σ×-≡,≡,≡←≡ (factor-pres-R-point i))))
     }
 
   copoint = λ {𝒫} → copoint[ 𝒫 ]

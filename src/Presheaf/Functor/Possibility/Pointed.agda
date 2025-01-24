@@ -37,16 +37,30 @@ module Pointed (PDF : PointedDFrame) where
 
   copoint[_] : ∀ 𝒫 → ◼ 𝒫 →̇ 𝒫
   copoint[ 𝒫 ] = record
-    { fun     = λ bp → bp .apply (elem R-point)
-    ; pres-≋  = λ bp≋bp' → bp≋bp' .apply-≋ (elem R-point)
-    ; natural = λ i bp → ≋[ 𝒫 ]-trans
-      (bp .natural i (elem R-point))
-      (bp .apply-≋ (proof (Σ×-≡,≡,≡←≡ (factor-pres-R-point i))))
+    { fun     = copoint-fun
+    ; pres-≋  = copoint-fun-pres-≋
+    ; natural = copoint-fun-natural
     }
+    where
+      copoint-fun : (◼ 𝒫) ₀ w → 𝒫 ₀ w
+      copoint-fun = λ bp → bp .apply (elem R-point)
+
+      opaque
+        unfolding ◼-map_ ◇-map_
+
+        copoint-fun-pres-≋ : Pres-≋ (◼ 𝒫) 𝒫 copoint-fun
+        copoint-fun-pres-≋ = λ bp≋bp' → bp≋bp' .apply-≋ (elem R-point)
+
+        copoint-fun-natural : Natural (◼ 𝒫) 𝒫 copoint-fun
+        copoint-fun-natural i bp = ≋[ 𝒫 ]-trans
+          (bp .natural i (elem R-point))
+          (bp .apply-≋ (proof (Σ×-≡,≡,≡←≡ (factor-pres-R-point i))))
 
   copoint = λ {𝒫} → copoint[ 𝒫 ]
 
   opaque
+    unfolding ◼-map_
+
     copoint-natural : (t : 𝒫 →̇ 𝒬) → copoint[ 𝒬 ] ∘ (◼-map t) ≈̇ t ∘ copoint[ 𝒫 ]
     copoint-natural {𝒬 = 𝒬} t = record { proof = λ _bp → ≋[ 𝒬 ]-refl }
 
@@ -97,6 +111,8 @@ module Reflexive (RDF  : ReflexiveDFrame) where
   point = λ {𝒫} → point[ 𝒫 ]
 
   opaque
+    unfolding ◇-map_
+
     -- point is a natural transformation from the identity functor to ◇
     point-natural : (t : 𝒫 →̇ 𝒬) → point[ 𝒬 ] ∘ t ≈̇ ◇-map t ∘ point[ 𝒫 ]
     point-natural {𝒫} {𝒬} t = record { proof = λ _p → ≋[ ◇ 𝒬 ]-refl }

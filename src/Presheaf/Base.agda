@@ -139,7 +139,7 @@ private
     ω ω' : 𝒫 →̇ 𝒬
 
 module _ {𝒫 𝒬 : Psh} where
-  abstract
+  opaque
     ≈̇-refl : Reflexive {A = 𝒫 →̇ 𝒬} _≈̇_
     ≈̇-refl = record { proof = λ {_} _ → ≋[ 𝒬 ]-refl }
 
@@ -166,17 +166,27 @@ module _ (𝒫 𝒬 : Psh) where
 
 _∘_ : (ψ : 𝒬 →̇ ℛ) → (φ : 𝒫 →̇ 𝒬) → 𝒫 →̇ ℛ
 _∘_ {𝒬} {ℛ} {𝒫} ψ φ = record
-  { fun     = λ p → ψ .apply (φ .apply p)
-  ; pres-≋  = λ p≋p' → ψ .apply-≋ (φ .apply-≋ p≋p')
-  ; natural = λ i p → let open EqReasoning ≋[ ℛ ]-setoid in begin
-      wk[ ℛ ] i (ψ .apply (φ .apply p))  ≈⟨ ψ .natural _ _ ⟩
-      ψ .apply (wk[ 𝒬 ] i (φ .apply p))  ≈⟨ ψ .apply-≋ (φ .natural _ _) ⟩
-      ψ .apply (φ .apply (wk[ 𝒫 ] i p))  ∎
+  { fun     = ∘-fun
+  ; pres-≋  = ∘-fun-pres-≋
+  ; natural = ∘-fun-natural
   }
+  where
+    ∘-fun : 𝒫 ₀ w → ℛ ₀ w
+    ∘-fun = λ p → ψ .apply (φ .apply p)
+
+    opaque
+      ∘-fun-pres-≋ : Pres-≋ 𝒫 ℛ (λ p → ψ .apply (φ .apply p))
+      ∘-fun-pres-≋ p≋p' = ψ .apply-≋ (φ .apply-≋ p≋p')
+
+      ∘-fun-natural : Natural 𝒫 ℛ ∘-fun
+      ∘-fun-natural i p = let open EqReasoning ≋[ ℛ ]-setoid in begin
+        wk[ ℛ ] i (ψ .apply (φ .apply p))  ≈⟨ ψ .natural _ _ ⟩
+        ψ .apply (wk[ 𝒬 ] i (φ .apply p))  ≈⟨ ψ .apply-≋ (φ .natural _ _) ⟩
+        ψ .apply (φ .apply (wk[ 𝒫 ] i p))  ∎
 
 _[_]' = _∘_
 
-abstract
+opaque
   ∘-pres-≈̇ : ψ ≈̇ ψ' → φ ≈̇ φ' → ψ ∘ φ ≈̇ ψ' ∘ φ'
   ∘-pres-≈̇ ψ≈̇ψ' φ≈̇φ' = record { proof = λ p → apply-sq ψ≈̇ψ' (φ≈̇φ' .apply-≋ p) }
 
@@ -198,10 +208,9 @@ id'[_] 𝒫 = record
 
 id' = λ {𝒫} → id'[ 𝒫 ]
 
-abstract
+opaque
   ∘-unit-left : ∀ {𝒫 : Psh} (𝒬 : Psh) (φ : 𝒫 →̇ 𝒬) → id'[ 𝒬 ] ∘ φ ≈̇ φ
   ∘-unit-left 𝒬 _ = record { proof = λ p → ≋[ 𝒬 ]-refl }
 
   ∘-unit-right : ∀ (𝒫 : Psh) {𝒬 : Psh} (φ : 𝒫 →̇ 𝒬) → φ ∘ id'[ 𝒫 ] ≈̇ φ
   ∘-unit-right _ {𝒬} _ = record { proof = λ p → ≋[ 𝒬 ]-refl }
-

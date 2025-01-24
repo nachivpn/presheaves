@@ -110,27 +110,33 @@ syntax ◇-≋[]-syn 𝒫 x y = x ◇-≋[ 𝒫 ] y
 -- ◇ is a presheaf functor
 ---------------------------
 
-◇-map-fun : (f : {w : W} → 𝒫 ₀ w → 𝒬 ₀ w) → ({w : W} → ◇-Fam 𝒫 w → ◇-Fam 𝒬 w)
-◇-map-fun f (elem (v , r , p)) = elem (v , r , f p)
-
+-- made opaque to speedup type-checking and discourage relying on implementation details
 opaque
-  ◇-map-fun-pres-≋ : {f : {w : W} → 𝒫 ₀ w → 𝒬 ₀ w} (f-pres-≋ : Pres-≋ 𝒫 𝒬 f) → Pres-≋ (◇ 𝒫) (◇ 𝒬) (◇-map-fun f)
-  ◇-map-fun-pres-≋ f-pres-≋ (proof (≡-refl , ≡-refl , p≋p')) = proof (≡-refl , ≡-refl , f-pres-≋ p≋p')
 
-  ◇-map-fun-natural : {f : {w : W} → 𝒫 ₀ w → 𝒬 ₀ w} (f-natural : Natural 𝒫 𝒬 f) → Natural (◇ 𝒫) (◇ 𝒬) (◇-map-fun f)
-  ◇-map-fun-natural f-natural i (elem (v , r , p)) = proof (≡-refl , (≡-refl , f-natural _ p))
+  ◇-map-fun : (f : {w : W} → 𝒫 ₀ w → 𝒬 ₀ w) → ({w : W} → ◇-Fam 𝒫 w → ◇-Fam 𝒬 w)
+  ◇-map-fun f (elem (v , r , p)) = elem (v , r , f p)
 
   ◇-map-fun-pres-≈̇ : {t t' : 𝒫 →̇ 𝒬} → t ≈̇ t' → (p : ◇-Fam 𝒫 w) → ◇-map-fun (t .apply) p ◇-≋[ 𝒬 ] ◇-map-fun (t' .apply) p
   ◇-map-fun-pres-≈̇ {𝒫} t≈̇t' (elem (v , r , p)) = proof (≡-refl , (≡-refl , apply-sq t≈̇t' ≋[ 𝒫 ]-refl))
 
-◇-map_ : {𝒫 𝒬 : Psh} → (t : 𝒫 →̇ 𝒬) → (◇ 𝒫 →̇ ◇ 𝒬)
-◇-map_ {𝒫} {𝒬} t = record
-  { fun     = ◇-map-fun (t .apply)
-  ; pres-≋  = ◇-map-fun-pres-≋ (t .apply-≋)
-  ; natural = ◇-map-fun-natural (t .natural)
-  }
+  ◇-map_ : {𝒫 𝒬 : Psh} → (t : 𝒫 →̇ 𝒬) → (◇ 𝒫 →̇ ◇ 𝒬)
+  ◇-map_ {𝒫} {𝒬} t = record
+    { fun     = ◇-map-fun (t .apply)
+    ; pres-≋  = ◇-map-fun-pres-≋ (t .apply-≋)
+    ; natural = ◇-map-fun-natural (t .natural)
+    }
+    where
+      opaque
+        ◇-map-fun-pres-≋ : {f : {w : W} → 𝒫 ₀ w → 𝒬 ₀ w} (f-pres-≋ : Pres-≋ 𝒫 𝒬 f) → Pres-≋ (◇ 𝒫) (◇ 𝒬) (◇-map-fun f)
+        ◇-map-fun-pres-≋ f-pres-≋ (proof (≡-refl , ≡-refl , p≋p')) = proof (≡-refl , ≡-refl , f-pres-≋ p≋p')
+
+        ◇-map-fun-natural : {f : {w : W} → 𝒫 ₀ w → 𝒬 ₀ w} (f-natural : Natural 𝒫 𝒬 f) → Natural (◇ 𝒫) (◇ 𝒬) (◇-map-fun f)
+        ◇-map-fun-natural f-natural i (elem (v , r , p)) = proof (≡-refl , (≡-refl , f-natural _ p))
+
 
 opaque
+  unfolding ◇-map_
+
   ◇-map-pres-≈̇ : {𝒫 𝒬 : Psh} {t t' : 𝒫 →̇ 𝒬} → t ≈̇ t' → ◇-map t ≈̇ ◇-map t'
   ◇-map-pres-≈̇ t≈̇t' = record { proof = λ p → ◇-map-fun-pres-≈̇ t≈̇t' p }
 
@@ -139,4 +145,3 @@ opaque
 
   ◇-map-pres-∘ : {𝒫 𝒬 ℛ : Psh} (t' : 𝒬 →̇ ℛ) (t : 𝒫 →̇ 𝒬) → ◇-map (t' ∘ t) ≈̇ ◇-map t' ∘ ◇-map t
   ◇-map-pres-∘ _t' _t = record { proof = λ p → ◇-≋-refl }
-

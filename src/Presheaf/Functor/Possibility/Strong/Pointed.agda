@@ -38,6 +38,8 @@ module Pointed (PDF : PointedDFrame) (IPDF : InclusivePointedDFrame IDF PDF) whe
   open Pointed PDF
 
   opaque
+    unfolding ◇-map_
+
     ◇-strong-point : strength[ 𝒫 , 𝒬 ] ∘ id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]
     ◇-strong-point {𝒫} {𝒬} = record { proof = λ _ → proof (≡-refl , ≡-refl
       , proof (wk[ 𝒫 ]-pres-≡-≋ R-to-⊆-pres-R-point ≋[ 𝒫 ]-refl , ≋[ 𝒬 ]-refl)) }
@@ -49,7 +51,7 @@ module Reflexive (RDF : ReflexiveDFrame) (IRDF : InclusiveReflexiveDFrame IDF RD
 
   open import Presheaf.Functor.Possibility.Pointed
   open Reflexive RDF
-  
+
   opaque
     ◇-strong-point : strength[ 𝒫 , 𝒬 ] ∘ id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]
     ◇-strong-point {𝒫} {𝒬} = record { proof = λ p×◇q → let p = π₁' .apply p×◇q in proof

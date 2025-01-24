@@ -140,7 +140,7 @@ module _ {𝒫 𝒬 : Psh} where
     pair'-pres-≈̇-right {t = t} u≈̇u' = pair'-pres-≈̇ (≈̇-refl {x = t}) u≈̇u'
 
     pair'-nat : ∀ (t : ℛ →̇ 𝒫) (u : ℛ →̇ 𝒬) (s : ℛ' →̇ ℛ) → pair' t u ∘ s ≈̇ pair' (t ∘ s) (u ∘ s)
-    pair'-nat _t _u _s = ≈̇-refl
+    pair'-nat _t _u _s = record { proof = λ p → ≋[ 𝒫 ×' 𝒬 ]-refl }
 
     ×'-beta-left : ∀ {t : ℛ →̇ 𝒫} (u : ℛ →̇ 𝒬) → fst' (pair' t u) ≈̇ t
     ×'-beta-left {_t} _u = record { proof = λ _r → ≋[ 𝒫 ]-refl }

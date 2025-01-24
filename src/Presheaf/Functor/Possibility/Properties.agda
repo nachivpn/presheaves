@@ -46,45 +46,68 @@ private
 -D_ : (v : W) → Psh
 -D v = ◇ (-⊇ v)
 
--D-mapᵒ : w ⊆ v → (-D v) →̇ (-D w)
+-D-mapᵒ_ : w ⊆ v → (-D v) →̇ (-D w)
 -D-mapᵒ i = ◇-map (-⊇-mapᵒ i)
-  
-opaque
 
+opaque
   -D-mapᵒ-pres-refl : -D-mapᵒ ⊆-refl[ w ] ≈̇ id'
-  -D-mapᵒ-pres-refl = ≈̇-trans (◇-map-pres-≈̇ -⊇-mapᵒ-pres-refl) ◇-map-pres-id 
+  -D-mapᵒ-pres-refl = ≈̇-trans (◇-map-pres-≈̇ -⊇-mapᵒ-pres-refl) ◇-map-pres-id
 
   -D-mapᵒ-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') → -D-mapᵒ (⊆-trans i i') ≈̇ -D-mapᵒ i ∘ -D-mapᵒ i'
   -D-mapᵒ-pres-trans i i' = ≈̇-trans (◇-map-pres-≈̇ (-⊇-mapᵒ-pres-trans i i')) (◇-map-pres-∘ (-⊇-mapᵒ i) (-⊇-mapᵒ i'))
 
-  -- observe:
-  _ : w D v → -D v ₀ w
-  _ = elem
+-- observe:
+_ : w D v → -D v ₀ w
+_ = elem
+
+_ : -D v ₀ w → w D v
+_ = triple
 
 -------------------------
 -- ◼ is presheaf functor
 -------------------------
 
--- For all (D) pasts
+-- For all D-pasts
 ◼_ : Psh → Psh
 ◼_ 𝒫 = record
   { Fam           = λ v → Hom (-D v) 𝒫
   ; _≋_           = _≈̇_
   ; ≋-equiv       = λ _ → ≈̇-equiv
   ; wk            = λ i f → f ∘ -D-mapᵒ i
-  ; wk-pres-≋     = λ i x≋y → ∘-pres-≈̇-left x≋y (-D-mapᵒ i)
-  ; wk-pres-refl  = λ f → ≈̇-trans (∘-pres-≈̇-right f -D-mapᵒ-pres-refl) (∘-unit-right _ f)
-  ; wk-pres-trans = λ i i' f → ≈̇-trans (∘-pres-≈̇-right f (-D-mapᵒ-pres-trans i i')) (≈̇-sym (∘-assoc f (-D-mapᵒ i) (-D-mapᵒ i')) )
+  ; wk-pres-≋     = wk-pres-≋
+  ; wk-pres-refl  = wk-pres-refl
+  ; wk-pres-trans = wk-pres-trans
   }
+  where
+    opaque
+      wk-pres-≋ : (i : w ⊆ v) {x y : Hom (-D w) 𝒫} → x ≈̇ y → x ∘ -D-mapᵒ i ≈̇ y ∘ -D-mapᵒ i
+      wk-pres-≋ i x≋y = ∘-pres-≈̇-left x≋y (-D-mapᵒ i)
 
-◼-map_ : {𝒫 𝒬 : Psh} → (t : 𝒫 →̇ 𝒬) → (◼ 𝒫 →̇ ◼ 𝒬)
-◼-map_ {𝒫} {𝒬} t = record
- { fun     = t ∘_
- ; pres-≋  = ∘-pres-≈̇-right t
- ; natural = λ i f → record { proof = λ d → ≋[ 𝒬 ]-refl }
- }
+      wk-pres-refl : (f : Hom (-D w) 𝒫) → f ∘ -D-mapᵒ ⊆-refl ≈̇ f
+      wk-pres-refl f = ≈̇-trans (∘-pres-≈̇-right f -D-mapᵒ-pres-refl) (∘-unit-right _ f)
 
+      wk-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') (f : Hom (-D w) 𝒫) → f ∘ -D-mapᵒ (⊆-trans i i') ≈̇ (f ∘ -D-mapᵒ i) ∘ -D-mapᵒ i'
+      wk-pres-trans i i' f = ≈̇-trans (∘-pres-≈̇-right f (-D-mapᵒ-pres-trans i i')) (≈̇-sym (∘-assoc f (-D-mapᵒ i) (-D-mapᵒ i')) )
+
+-- made opaque to speedup type-checking and relying on implementation details
 opaque
+  ◼-map_ : {𝒫 𝒬 : Psh} → (t : 𝒫 →̇ 𝒬) → (◼ 𝒫 →̇ ◼ 𝒬)
+  ◼-map_ {𝒫} {𝒬} t = record
+    { fun     = ◼-map-fun
+    ; pres-≋  = ◼-map-fun-pres-≋
+    ; natural = ◼-map-fun-natural
+    }
+    where
+      ◼-map-fun : (◼ 𝒫) ₀ w → (◼ 𝒬) ₀ w
+      ◼-map-fun = t ∘_
+
+      opaque
+        ◼-map-fun-pres-≋ : Pres-≋ (◼ 𝒫) (◼ 𝒬) ◼-map-fun
+        ◼-map-fun-pres-≋ = ∘-pres-≈̇-right t
+
+        ◼-map-fun-natural : Natural (◼ 𝒫) (◼ 𝒬) ◼-map-fun
+        ◼-map-fun-natural i f = record { proof = λ d → ≋[ 𝒬 ]-refl }
+
   ◼-map-pres-≈̇ : {𝒫 𝒬 : Psh} {f g : 𝒫 →̇ 𝒬} → f ≈̇ g → ◼-map f ≈̇ ◼-map g
   ◼-map-pres-≈̇ f≈̇g = record { proof = ∘-pres-≈̇-left f≈̇g }
 
@@ -93,7 +116,7 @@ opaque
 
   ◼-map-pres-∘ : {𝒫 𝒬 ℛ : Psh} (t' : 𝒬 →̇ ℛ) (t : 𝒫 →̇ 𝒬) → ◼-map (t' ∘ t) ≈̇ ◼-map t' ∘ ◼-map t
   ◼-map-pres-∘ {𝒫} {ℛ = ℛ} t' t = record { proof = ∘-assoc t' t }
-  
+
 ---------
 -- ◇ ⊣ ◼
 ---------
@@ -104,14 +127,26 @@ opaque
 --
 η[_] : ∀ 𝒫 → 𝒫 →̇ ◼ ◇ 𝒫
 η[ 𝒫 ] = record
-  { fun     = λ p → ◇-map (wk[ 𝒫 ]' .apply p)
-  ; pres-≋  = λ p≋p' → ◇-map-pres-≈̇ (wk[ 𝒫 ]' .apply-≋ p≋p')
-  ; natural = λ {w} i p → ≈̇-trans
-      (≈̇-sym (◇-map-pres-∘ (wk[ 𝒫 ]' .apply p) (-⊇-mapᵒ i)))
-      (◇-map-pres-≈̇ (wk[ 𝒫 ]' .natural i p))
+  { fun     = η-fun
+  ; pres-≋  = η-pres-≋
+  ; natural = η-natural
   }
+  where
+    η-fun : 𝒫 ₀ w → (◼ (◇ 𝒫)) ₀ w
+    η-fun p = ◇-map (wk[ 𝒫 ]' .apply p)
+
+    opaque
+      η-pres-≋ : Pres-≋ 𝒫 (◼ (◇ 𝒫)) η-fun
+      η-pres-≋ p≋p' = ◇-map-pres-≈̇ (wk[ 𝒫 ]' .apply-≋ p≋p')
+
+      η-natural : Natural 𝒫 (◼ (◇ 𝒫)) η-fun
+      η-natural {w} i p = ≈̇-trans
+        (≈̇-sym (◇-map-pres-∘ (wk[ 𝒫 ]' .apply p) (-⊇-mapᵒ i)))
+        (◇-map-pres-≈̇ (wk[ 𝒫 ]' .natural i p))
 
 opaque
+  unfolding ◼-map_ ◇-map_
+
   η-natural : (t : 𝒫 →̇ 𝒬) → η[ 𝒬 ] ∘ t ≈̇ ◼-map (◇-map t) ∘ η[ 𝒫 ]
   η-natural {𝒫} {𝒬} t = record { proof = λ p →
     record { proof = λ (elem d) → proof (≡-refl , ≡-refl , t .natural (wit⊆ d) p) } }
@@ -131,6 +166,8 @@ opaque
     ϵ-fun (elem (v , r , f)) = f .apply (elem (R-to-D r))
 
     opaque
+      unfolding ◇-map_
+
       ϵ-pres-≋ : Pres-≋ (◇ (◼ 𝒫)) 𝒫 ϵ-fun
       ϵ-pres-≋ (proof (≡-refl , ≡-refl , f≋f')) = f≋f' .apply-≋ _
 
@@ -140,6 +177,8 @@ opaque
         (f .apply-≋ (proof (-, ≡-refl , ⊆-trans-unit _)))
 
 opaque
+  unfolding ◼-map_ ◇-map_
+
   ϵ-natural : (t : 𝒫 →̇ 𝒬) → t ∘ ϵ[ 𝒫 ] ≈̇ ϵ[ 𝒬 ] ∘ (◇-map (◼-map t))
   ϵ-natural {𝒫} {𝒬} t = record { proof = λ p → ≋[ 𝒬 ]-refl }
 

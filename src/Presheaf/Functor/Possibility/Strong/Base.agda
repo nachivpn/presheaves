@@ -64,6 +64,8 @@ strength[ 𝒫 , 𝒬 ] = record
         , ≋[ 𝒬 ]-refl))))
 
 opaque
+  unfolding ◇-map_
+  
   strength-natural₁ : (t : 𝒫 →̇ 𝒫') → strength[ 𝒫' , 𝒬 ] ∘ (t ×'-map id') ≈̇ (◇-map (t ×'-map id')) ∘ strength[ 𝒫 , 𝒬 ]
   strength-natural₁ {𝒬 = 𝒬} t = record { proof = λ _p → proof (refl , refl , proof (t .natural _ _ , ≋[ 𝒬 ]-refl)) }
 

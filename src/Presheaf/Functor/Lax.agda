@@ -129,6 +129,8 @@ syntax ◯-≋[]-syn 𝒫 x y = x ◯-≋[ 𝒫 ] y
     }
 
 opaque
+  unfolding ◇-map_
+
   ◯-map-pres-≈̇ : {t t' : 𝒫 →̇  𝒬} → t ≈̇ t' → ◯-map t ≈̇ ◯-map t'
   ◯-map-pres-≈̇ t≈̇t' = record { proof = λ p → proof λ i → ◇-map-fun-pres-≈̇ t≈̇t' (p .apply-◯ i) }
 

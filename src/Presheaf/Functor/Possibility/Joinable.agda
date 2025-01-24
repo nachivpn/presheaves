@@ -46,6 +46,8 @@ module Joinable (JDF : JoinableDFrame) where
     squash-fun (elem (u , r1 , (elem (v , r2 , bp)))) = bp .apply (elem (R-join r1 r2))
 
     opaque
+      unfolding ◼-map_ ◇-map_
+
       squash-pres-≋ : Pres-≋ (◇ (◇ (◼ 𝒫))) 𝒫 squash-fun
       squash-pres-≋ (proof (≡-refl , ≡-refl , (proof (≡-refl , ≡-refl , p≋p')))) = p≋p' .apply-≋ (elem (R-join _ _))
 
@@ -55,43 +57,46 @@ module Joinable (JDF : JoinableDFrame) where
         (bp .apply-≋ (proof (Σ×-≡,≡,≡←≡ ((factor-pres-R-join i r1 r2)))))
 
   opaque
+    unfolding ◼-map_ ◇-map_
+
     squash-natural : (t : 𝒫 →̇ 𝒬) → t ∘ squash[ 𝒫 ] ≈̇ squash[ 𝒬 ] ∘ ◇-map (◇-map (◼-map t))
     squash-natural {𝒫} {𝒬} t = record { proof = λ _p → ≋[ 𝒬 ]-refl }
-
-    squash-assoc : squash[ 𝒫 ] ∘ squash[ ◇ ◇ ◼ 𝒫 ] ≈̇ squash[ 𝒫 ] ∘ ◇-map (◇-map (◼-map squash[ 𝒫 ]))
-    squash-assoc {𝒫} = squash-natural squash[ 𝒫 ]
 
   join[_] : ∀ 𝒫 → ◇ ◇ 𝒫 →̇ ◇ 𝒫
   join[ 𝒫 ] = squash[ ◇ 𝒫 ] ∘ ◇-map (◇-map η[ 𝒫 ])
 
   opaque
-    -- this is a low-level version that manually constructs a proof
-    -- since the generic proof below is much slower
-    join-natural : (t :  𝒫 →̇  𝒬) → join[ 𝒬 ] ∘ ◇-map (◇-map t) ≈̇ ◇-map t ∘ join[ 𝒫 ]
-    join-natural {𝒫} {𝒬} t = record { proof = λ _p → proof (≡-refl , ≡-refl , t .natural _ _) }
 
-    -- join-natural : (t : 𝒫 →̇ 𝒬) → join[ 𝒬 ] ∘ ◇-map (◇-map t) ≈̇ ◇-map t ∘ join[ 𝒫 ]
-    -- join-natural {𝒫} {𝒬} t = let open EqReasoning (→̇-setoid (◇ ◇ 𝒫) (◇ 𝒬)) in begin
-    --   (squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map η[ 𝒬 ])) ∘ ◇-map (◇-map t)
-    --     ≈⟨ ∘-assoc squash[ ◇ 𝒬 ] (◇-map (◇-map η[ 𝒬 ])) (◇-map (◇-map t)) ⟩
-    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map η[ 𝒬 ]) ∘ ◇-map (◇-map t)
-    --     ≈˘⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-∘ (◇-map η[ 𝒬 ]) (◇-map t)) ⟩
-    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map η[ 𝒬 ] ∘ ◇-map t)
-    --     ≈˘⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-≈̇ (◇-map-pres-∘ (η[ 𝒬 ]) t)) ⟩
-    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (η[ 𝒬 ] ∘ t))
-    --     ≈⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-≈̇ (◇-map-pres-≈̇ (η-natural t))) ⟩
-    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map (◇-map t) ∘ η[ 𝒫 ]))
-    --     ≈⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-≈̇ (◇-map-pres-∘ (◼-map (◇-map t)) η[ 𝒫 ])) ⟩
-    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map (◇-map t)) ∘ ◇-map η[ 𝒫 ])
-    --     ≈⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-∘ (◇-map (◼-map (◇-map t))) (◇-map η[ 𝒫 ])) ⟩
-    --   squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map ◇-map t)) ∘ ◇-map (◇-map η[ 𝒫 ])
-    --     ≈˘⟨ ∘-assoc squash[ ◇ 𝒬 ] (◇-map (◇-map (◼-map ◇-map t))) (◇-map (◇-map η[ 𝒫 ])) ⟩
-    --   (squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map ◇-map t))) ∘ ◇-map (◇-map η[ 𝒫 ])
-    --     ≈˘⟨ ∘-pres-≈̇-left (squash-natural (◇-map t)) (◇-map (◇-map η[ 𝒫 ])) ⟩
-    --   (◇-map t ∘ squash[ ◇ 𝒫 ]) ∘ ◇-map (◇-map η[ 𝒫 ])
-    --     ≈⟨ ∘-assoc (◇-map t) squash[ ◇ 𝒫 ] (◇-map (◇-map η[ 𝒫 ])) ⟩
-    --   ◇-map t ∘ squash[ ◇ 𝒫 ] ∘ ◇-map (◇-map η[ 𝒫 ])
-    --     ∎
+    join-natural : (t : 𝒫 →̇ 𝒬) → join[ 𝒬 ] ∘ ◇-map (◇-map t) ≈̇ ◇-map t ∘ join[ 𝒫 ]
+    join-natural {𝒫} {𝒬} t = let open EqReasoning (→̇-setoid (◇ ◇ 𝒫) (◇ 𝒬)) in begin
+      (squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map η[ 𝒬 ])) ∘ ◇-map (◇-map t)
+        ≈⟨ ∘-assoc squash[ ◇ 𝒬 ] (◇-map (◇-map η[ 𝒬 ])) (◇-map (◇-map t)) ⟩
+      squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map η[ 𝒬 ]) ∘ ◇-map (◇-map t)
+        ≈˘⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-∘ (◇-map η[ 𝒬 ]) (◇-map t)) ⟩
+      squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map η[ 𝒬 ] ∘ ◇-map t)
+        ≈˘⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-≈̇ (◇-map-pres-∘ (η[ 𝒬 ]) t)) ⟩
+      squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (η[ 𝒬 ] ∘ t))
+        ≈⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-≈̇ (◇-map-pres-≈̇ (η-natural t))) ⟩
+      squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map (◇-map t) ∘ η[ 𝒫 ]))
+        ≈⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-≈̇ (◇-map-pres-∘ (◼-map (◇-map t)) η[ 𝒫 ])) ⟩
+      squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map (◇-map t)) ∘ ◇-map η[ 𝒫 ])
+        ≈⟨ ∘-pres-≈̇-right squash[ ◇ 𝒬 ] (◇-map-pres-∘ (◇-map (◼-map (◇-map t))) (◇-map η[ 𝒫 ])) ⟩
+      squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map ◇-map t)) ∘ ◇-map (◇-map η[ 𝒫 ])
+        ≈˘⟨ ∘-assoc squash[ ◇ 𝒬 ] (◇-map (◇-map (◼-map ◇-map t))) (◇-map (◇-map η[ 𝒫 ])) ⟩
+      (squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map (◼-map ◇-map t))) ∘ ◇-map (◇-map η[ 𝒫 ])
+        ≈˘⟨ ∘-pres-≈̇-left (squash-natural (◇-map t)) (◇-map (◇-map η[ 𝒫 ])) ⟩
+      (◇-map t ∘ squash[ ◇ 𝒫 ]) ∘ ◇-map (◇-map η[ 𝒫 ])
+        ≈⟨ ∘-assoc (◇-map t) squash[ ◇ 𝒫 ] (◇-map (◇-map η[ 𝒫 ])) ⟩
+      ◇-map t ∘ squash[ ◇ 𝒫 ] ∘ ◇-map (◇-map η[ 𝒫 ])
+        ∎
+
+  opaque
+    unfolding ◇-map_
+
+    -- this low-level version is a bit faster than join-natural
+    join-natural' : (t :  𝒫 →̇  𝒬) → join[ 𝒬 ] ∘ ◇-map (◇-map t) ≈̇ ◇-map t ∘ join[ 𝒫 ]
+    join-natural' {𝒫} {𝒬} t = record { proof = λ _p → proof (≡-refl , ≡-refl , t .natural _ _) }
+
 
 module Transitive (TDF : TransitiveDFrame) where
 
@@ -117,6 +122,8 @@ module Transitive (TDF : TransitiveDFrame) where
       ◇-join-natural i (elem (_u , r1 , (elem (_v , r2 , _p)))) rewrite factor-pres-R-trans i r1 r2 = ≋[ ◇ 𝒫 ]-refl
 
   opaque
+    unfolding ◇-map_
+
     -- join is a natural transformation from the composition of functors ◇ ∘ ◇ to ◇
     join-natural : (t :  𝒫 →̇  𝒬) → join[ 𝒬 ] ∘ (◇-map (◇-map t)) ≈̇ (◇-map t) ∘ join[ 𝒫 ]
     join-natural {𝒫} {𝒬} t = record { proof = λ _p → ≋[ ◇ 𝒬 ]-refl }

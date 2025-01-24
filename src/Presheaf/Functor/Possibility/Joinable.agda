@@ -66,7 +66,6 @@ module Joinable (JDF : JoinableDFrame) where
   join[ 𝒫 ] = squash[ ◇ 𝒫 ] ∘ ◇-map (◇-map η[ 𝒫 ])
 
   opaque
-
     join-natural : (t : 𝒫 →̇ 𝒬) → join[ 𝒬 ] ∘ ◇-map (◇-map t) ≈̇ ◇-map t ∘ join[ 𝒫 ]
     join-natural {𝒫} {𝒬} t = let open EqReasoning (→̇-setoid (◇ ◇ 𝒫) (◇ 𝒬)) in begin
       (squash[ ◇ 𝒬 ] ∘ ◇-map (◇-map η[ 𝒬 ])) ∘ ◇-map (◇-map t)
@@ -97,6 +96,11 @@ module Joinable (JDF : JoinableDFrame) where
     join-natural' : (t :  𝒫 →̇  𝒬) → join[ 𝒬 ] ∘ ◇-map (◇-map t) ≈̇ ◇-map t ∘ join[ 𝒫 ]
     join-natural' {𝒫} {𝒬} t = record { proof = λ _p → proof (≡-refl , ≡-refl , t .natural _ _) }
 
+  opaque
+    unfolding ◼-map_ ◇-map_
+
+    squash-join-com : squash[ 𝒫 ] ∘ ◇-map (join[ ◼ 𝒫 ]) ≈̇ squash[ 𝒫 ] ∘ join[ ◇ ◼ 𝒫 ] -- : ◇ ◇ ◇ ◼ 𝒫 → 𝒫
+    apply-≋ squash-join-com (elem (w1 , r1 , elem (w2 , r2 , elem (w3 , r3 , p)))) = p .apply-≋ (proof (Σ×-≡,≡,≡←≡ (R-join-assoc r1 r2 r3)))
 
 module Transitive (TDF : TransitiveDFrame) where
 

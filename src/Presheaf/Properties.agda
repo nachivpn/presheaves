@@ -67,10 +67,10 @@ private
 
 opaque
   -⊇-mapᵒ-pres-refl : -⊇-mapᵒ ⊆-refl[ w ] ≈̇ id'
-  -⊇-mapᵒ-pres-refl = record { proof = ⊆-trans-unit-left }
+  -⊇-mapᵒ-pres-refl = proof-≈̇ ⊆-trans-unit-left
 
   -⊇-mapᵒ-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') → -⊇-mapᵒ (⊆-trans i i') ≈̇ -⊇-mapᵒ i ∘ -⊇-mapᵒ i'
-  -⊇-mapᵒ-pres-trans i i' = record { proof = ⊆-trans-assoc i i' }
+  -⊇-mapᵒ-pres-trans i i' = proof-≈̇ (⊆-trans-assoc i i')
 
 --
 -- The comonad ◻ᵢ
@@ -104,20 +104,18 @@ opaque
   ◻ᵢ-map_ {𝒫} {𝒬} t = record
     { fun     = t ∘_
     ; pres-≋  = ∘-pres-≈̇-right t
-    ; natural = λ i f → record { proof = λ d → ≋[ 𝒬 ]-refl }
+    ; natural = λ i f → proof-≈̇ (λ d → ≋[ 𝒬 ]-refl)
     }
 
-opaque
-  unfolding ◻ᵢ-map_
-
   ◻ᵢ-map-pres-≈̇ : {𝒫 𝒬 : Psh} {f g : 𝒫 →̇ 𝒬} → f ≈̇ g → ◻ᵢ-map f ≈̇ ◻ᵢ-map g
-  ◻ᵢ-map-pres-≈̇ f≈̇g = record { proof = ∘-pres-≈̇-left f≈̇g }
+  ◻ᵢ-map-pres-≈̇ f≈̇g = proof-≈̇ (∘-pres-≈̇-left f≈̇g)
 
   ◻ᵢ-map-pres-id : {𝒫 : Psh} → ◻ᵢ-map id'[ 𝒫 ] ≈̇ id'
-  ◻ᵢ-map-pres-id = record { proof = ∘-unit-left _ }
+  ◻ᵢ-map-pres-id = proof-≈̇ (∘-unit-left _)
 
   ◻ᵢ-map-pres-∘ : {𝒫 𝒬 ℛ : Psh} (t' : 𝒬 →̇ ℛ) (t : 𝒫 →̇ 𝒬) → ◻ᵢ-map (t' ∘ t) ≈̇ ◻ᵢ-map t' ∘ ◻ᵢ-map t
-  ◻ᵢ-map-pres-∘ {𝒫} {ℛ = ℛ} t' t = record { proof = ∘-assoc t' t }
+  ◻ᵢ-map-pres-∘ t' t = proof-≈̇ (∘-assoc t' t)
+
 
 -- wk[_] with arguments flipped
 wk[_]' : ∀ 𝒫 → 𝒫 →̇ ◻ᵢ 𝒫
@@ -136,16 +134,16 @@ wk[_]' 𝒫 = record
 
     opaque
       wk'-pres-≋ : Pres-≋ 𝒫 (◻ᵢ 𝒫) wk'-fun
-      wk'-pres-≋ p≋p' = record { proof = λ i → wk[ 𝒫 ]-pres-≋ i p≋p' }
+      wk'-pres-≋ p≋p' = proof-≈̇ (λ i → wk[ 𝒫 ]-pres-≋ i p≋p')
 
       wk'-natural : Natural 𝒫 (◻ᵢ 𝒫) wk'-fun
-      wk'-natural i p = record { proof = λ i' → wk[ 𝒫 ]-pres-trans i i' p }
+      wk'-natural i p = proof-≈̇ (λ i' → wk[ 𝒫 ]-pres-trans i i' p)
 
 opaque
   unfolding ◻ᵢ-map_
 
   wk'-natural : (t : 𝒫 →̇ 𝒬) → wk[ 𝒬 ]' ∘ t ≈̇ (◻ᵢ-map t) ∘ wk[ 𝒫 ]'
-  wk'-natural t = record { proof = λ p → record { proof = λ i → t .natural i p } }
+  wk'-natural t = proof-≈̇ (λ p → proof-≈̇ (λ i → t .natural i p))
 
 copointᵢ[_] : ∀ 𝒫 → ◻ᵢ 𝒫 →̇ 𝒫
 copointᵢ[ 𝒫 ] = record
@@ -160,7 +158,7 @@ copointᵢ[ 𝒫 ] = record
     opaque
 
       copoint-pres-≋ : Pres-≋ (◻ᵢ 𝒫) 𝒫 copoint-fun
-      copoint-pres-≋ = λ f≋f' → f≋f' .apply-≋ ⊆-refl
+      copoint-pres-≋ {_} {f} {f'} = λ f≋f' → apply-≈̇' f≋f' ≡-refl
 
       copoint-natural :  Natural (◻ᵢ 𝒫) 𝒫 (copoint-fun)
       copoint-natural i f = ≋[ 𝒫 ]-trans (f .natural i ⊆-refl) (f .apply-≋ (⊆-trans-unit i))

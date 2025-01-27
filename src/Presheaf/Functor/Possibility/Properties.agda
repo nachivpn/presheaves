@@ -93,29 +93,23 @@ _ = triple
 opaque
   ◼-map_ : {𝒫 𝒬 : Psh} → (t : 𝒫 →̇ 𝒬) → (◼ 𝒫 →̇ ◼ 𝒬)
   ◼-map_ {𝒫} {𝒬} t = record
-    { fun     = ◼-map-fun
-    ; pres-≋  = ◼-map-fun-pres-≋
+    { fun     = t ∘_
+    ; pres-≋  = ∘-pres-≈̇-right t
     ; natural = ◼-map-fun-natural
     }
     where
-      ◼-map-fun : (◼ 𝒫) ₀ w → (◼ 𝒬) ₀ w
-      ◼-map-fun = t ∘_
-
       opaque
-        ◼-map-fun-pres-≋ : Pres-≋ (◼ 𝒫) (◼ 𝒬) ◼-map-fun
-        ◼-map-fun-pres-≋ = ∘-pres-≈̇-right t
-
-        ◼-map-fun-natural : Natural (◼ 𝒫) (◼ 𝒬) ◼-map-fun
-        ◼-map-fun-natural i f = record { proof = λ d → ≋[ 𝒬 ]-refl }
+        ◼-map-fun-natural : Natural (◼ 𝒫) (◼ 𝒬) (t ∘_)
+        ◼-map-fun-natural i f = proof-≈̇ (λ d → ≋[ 𝒬 ]-refl)
 
   ◼-map-pres-≈̇ : {𝒫 𝒬 : Psh} {f g : 𝒫 →̇ 𝒬} → f ≈̇ g → ◼-map f ≈̇ ◼-map g
-  ◼-map-pres-≈̇ f≈̇g = record { proof = ∘-pres-≈̇-left f≈̇g }
+  ◼-map-pres-≈̇ f≈̇g = proof-≈̇ (∘-pres-≈̇-left f≈̇g)
 
   ◼-map-pres-id : {𝒫 : Psh} → ◼-map id'[ 𝒫 ] ≈̇ id'
-  ◼-map-pres-id = record { proof = ∘-unit-left _ }
+  ◼-map-pres-id = proof-≈̇ (∘-unit-left _)
 
   ◼-map-pres-∘ : {𝒫 𝒬 ℛ : Psh} (t' : 𝒬 →̇ ℛ) (t : 𝒫 →̇ 𝒬) → ◼-map (t' ∘ t) ≈̇ ◼-map t' ∘ ◼-map t
-  ◼-map-pres-∘ {𝒫} {ℛ = ℛ} t' t = record { proof = ∘-assoc t' t }
+  ◼-map-pres-∘ t' t = proof-≈̇ (∘-assoc t' t)
 
 ---------
 -- ◇ ⊣ ◼
@@ -148,13 +142,13 @@ opaque
   unfolding ◼-map_ ◇-map_
 
   η-natural : (t : 𝒫 →̇ 𝒬) → η[ 𝒬 ] ∘ t ≈̇ ◼-map (◇-map t) ∘ η[ 𝒫 ]
-  η-natural {𝒫} {𝒬} t = record { proof = λ p →
-    record { proof = λ (elem d) → proof (≡-refl , ≡-refl , t .natural (wit⊆ d) p) } }
+  η-natural {𝒫} {𝒬} t = proof-≈̇ (λ p → proof-≈̇ (λ (elem (_ , _ , i)) → proof (≡-refl , ≡-refl , t .natural i p)))
 
 --
 -- Intuition for ϵ:
 -- If p holds in the future for all pasts, then p holds now
 --
+
 ϵ[_] : ∀ 𝒫 → ◇ ◼ 𝒫 →̇ 𝒫
 ϵ[ 𝒫 ] = record
   { fun     = ϵ-fun
@@ -169,7 +163,7 @@ opaque
       unfolding ◇-map_
 
       ϵ-pres-≋ : Pres-≋ (◇ (◼ 𝒫)) 𝒫 ϵ-fun
-      ϵ-pres-≋ (proof (≡-refl , ≡-refl , f≋f')) = f≋f' .apply-≋ _
+      ϵ-pres-≋ (proof (≡-refl , ≡-refl , f≋f')) = apply-≈̇' f≋f' ◇-≋-refl
 
       ϵ-natural : Natural (◇ (◼ 𝒫)) 𝒫 ϵ-fun
       ϵ-natural i (elem (v , r , f)) = ≋[ 𝒫 ]-trans
@@ -180,7 +174,7 @@ opaque
   unfolding ◼-map_ ◇-map_
 
   ϵ-natural : (t : 𝒫 →̇ 𝒬) → t ∘ ϵ[ 𝒫 ] ≈̇ ϵ[ 𝒬 ] ∘ (◇-map (◼-map t))
-  ϵ-natural {𝒫} {𝒬} t = record { proof = λ p → ≋[ 𝒬 ]-refl }
+  ϵ-natural {𝒫} {𝒬} t = proof-≈̇ (λ p → ≋[ 𝒬 ]-refl)
 
 η = λ {𝒫} → η[ 𝒫 ]
 ϵ = λ {𝒫} → ϵ[ 𝒫 ]

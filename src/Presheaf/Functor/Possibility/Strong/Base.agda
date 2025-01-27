@@ -67,13 +67,13 @@ opaque
   unfolding ◇-map_
   
   strength-natural₁ : (t : 𝒫 →̇ 𝒫') → strength[ 𝒫' , 𝒬 ] ∘ (t ×'-map id') ≈̇ (◇-map (t ×'-map id')) ∘ strength[ 𝒫 , 𝒬 ]
-  strength-natural₁ {𝒬 = 𝒬} t = record { proof = λ _p → proof (refl , refl , proof (t .natural _ _ , ≋[ 𝒬 ]-refl)) }
+  strength-natural₁ {𝒬 = 𝒬} t = proof-≈̇ (λ _p → proof (refl , refl , proof (t .natural _ _ , ≋[ 𝒬 ]-refl)))
 
   strength-natural₂ : (t : 𝒬 →̇ 𝒬') → strength[ 𝒫 , 𝒬' ] ∘ (id' ×'-map (◇-map t)) ≈̇ (◇-map (id' ×'-map t)) ∘ strength[ 𝒫 , 𝒬 ]
-  strength-natural₂ {𝒬' = 𝒬'} {𝒫 = 𝒫} t = record { proof = λ _p → proof (refl , refl , ≋[ 𝒫 ×' 𝒬' ]-refl) }
+  strength-natural₂ {𝒬' = 𝒬'} {𝒫 = 𝒫} t = proof-≈̇ (λ _p → proof (refl , refl , ≋[ 𝒫 ×' 𝒬' ]-refl))
 
   strength-assoc : ◇-map assoc' ∘ strength[ 𝒫 ×' 𝒬  , ℛ ] ≈̇ (strength[ 𝒫 , 𝒬 ×' ℛ ] ∘ (id' ×'-map strength[ 𝒬 , ℛ ]) ∘ assoc')
-  strength-assoc {𝒫 = 𝒫} {𝒬 = 𝒬} {ℛ = ℛ} = record { proof = λ _p → ≋[ ◇ (𝒫 ×' (𝒬 ×' ℛ)) ]-refl }
+  strength-assoc {𝒫 = 𝒫} {𝒬 = 𝒬} {ℛ = ℛ} = proof-≈̇ (λ _p → ≋[ ◇ (𝒫 ×' (𝒬 ×' ℛ)) ]-refl)
 
   strength-unit : ◇-map π₂' ∘ strength[ ⊤' , 𝒫 ] ≈̇ π₂'
-  strength-unit {𝒫} = record { proof = λ _p → ≋[ ◇ 𝒫 ]-refl }
+  strength-unit {𝒫} = proof-≈̇ (λ _p → ≋[ ◇ 𝒫 ]-refl)

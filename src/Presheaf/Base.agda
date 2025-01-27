@@ -119,35 +119,45 @@ open _→̇_ using (natural) renaming (fun to apply; pres-≋ to apply-≋) publ
 Hom : Psh → Psh → Set
 Hom 𝒫 𝒬 = 𝒫 →̇ 𝒬
 
-record _≈̇_ (φ ψ : 𝒫 →̇ 𝒬) : Set where -- type \~~ \^.
-  no-eta-equality
-  field
-    proof : ∀ (p : 𝒫 ₀ w) → φ .apply p ≋[ 𝒬 ] ψ .apply p
-
-  apply-sq : ∀ {p p' : 𝒫 ₀ w} → p ≋[ 𝒫 ] p' → φ .apply p ≋[ 𝒬 ] ψ .apply p' -- XXX: rename
-  apply-sq {p = p} {p'} p≋p' = let open EqReasoning ≋[ 𝒬 ]-setoid in begin
-    φ .apply p   ≈⟨ φ .apply-≋ p≋p' ⟩
-    φ .apply p'  ≈⟨ proof p' ⟩
-    ψ .apply p'  ∎
-
-open _≈̇_ using (apply-sq) renaming (proof to apply-≋) public
-
 private
   variable
     φ φ' : 𝒫 →̇ 𝒬
     ψ ψ' : 𝒫 →̇ 𝒬
     ω ω' : 𝒫 →̇ 𝒬
 
+-- made opaque to silence implicit argument hell
+-- can be unfolded to improve performance
+opaque
+  -- equality of two natural transformations
+  _≈̇_ : (φ ψ : 𝒫 →̇ 𝒬) → Set -- type \~~ \^.
+  _≈̇_ {𝒫} {𝒬} φ ψ = ∀ {w : W} (p : 𝒫 ₀ w) → φ .apply p ≋[ 𝒬 ] ψ .apply p
+
+  -- construct a proof of _≈̇_
+  proof-≈̇ : {φ ψ : 𝒫 →̇ 𝒬} → (∀ {w : W} (p : 𝒫 ₀ w) → φ .apply p ≋[ 𝒬 ] ψ .apply p) → φ ≈̇ ψ
+  proof-≈̇ f = f
+
+  -- consume a proof of _≈̇_
+  apply-≈̇ : {φ ψ : 𝒫 →̇ 𝒬} (φ≈̇ψ : φ ≈̇ ψ) → (∀ {w : W} (p : 𝒫 ₀ w) → φ .apply p ≋[ 𝒬 ] ψ .apply p)
+  apply-≈̇ φ≈̇ψ = φ≈̇ψ
+
+  -- a liberal version of apply-≈̇
+  apply-≈̇' : {φ ψ : 𝒫 →̇ 𝒬} (φ≈̇ψ : φ ≈̇ ψ) → (∀ {w : W} {p p' : 𝒫 ₀ w} → p ≋[ 𝒫 ] p' → φ .apply p ≋[ 𝒬 ] ψ .apply p')
+  apply-≈̇' {𝒫} {𝒬} {φ = φ} {ψ} φ≈̇ψ {p = p} {p'} p≋p' = let open EqReasoning ≋[ 𝒬 ]-setoid in begin
+    φ .apply p   ≈⟨ φ .apply-≋ p≋p' ⟩
+    φ .apply p'  ≈⟨ φ≈̇ψ p' ⟩
+    ψ .apply p'  ∎
+
+-- _≈̇_ is an equivalence relation
 module _ {𝒫 𝒬 : Psh} where
   opaque
     ≈̇-refl : Reflexive {A = 𝒫 →̇ 𝒬} _≈̇_
-    ≈̇-refl = record { proof = λ {_} _ → ≋[ 𝒬 ]-refl }
+    ≈̇-refl = proof-≈̇ (λ {_} _ → ≋[ 𝒬 ]-refl)
 
     ≈̇-sym : Symmetric {A = 𝒫 →̇ 𝒬} _≈̇_
-    ≈̇-sym φ≋φ' = record { proof = λ {_} p → ≋[ 𝒬 ]-sym (φ≋φ' ._≈̇_.proof p) }
+    ≈̇-sym φ≋φ' = proof-≈̇ λ {_} p → ≋[ 𝒬 ]-sym (apply-≈̇ φ≋φ' p)
 
     ≈̇-trans : Transitive {A = 𝒫 →̇ 𝒬} _≈̇_
-    ≈̇-trans φ≋ψ ψ≋ω = record { proof = λ {_} p → ≋[ 𝒬 ]-trans (φ≋ψ ._≈̇_.proof p) (ψ≋ω ._≈̇_.proof p) }
+    ≈̇-trans φ≋ψ ψ≋ω = proof-≈̇ λ {_} p → ≋[ 𝒬 ]-trans (apply-≈̇ φ≋ψ p) (apply-≈̇ ψ≋ω p)
 
     ≈̇-equiv : IsEquivalence {A = 𝒫 →̇ 𝒬} _≈̇_
     ≈̇-equiv = record
@@ -156,6 +166,7 @@ module _ {𝒫 𝒬 : Psh} where
       ; trans = ≈̇-trans
       }
 
+-- natural transformations form a setoid
 module _ (𝒫 𝒬 : Psh) where
   →̇-setoid : Setoid 0ℓ 0ℓ
   →̇-setoid = record
@@ -164,6 +175,21 @@ module _ (𝒫 𝒬 : Psh) where
     ; isEquivalence = ≈̇-equiv
     }
 
+-------------------------------------------
+-- Natural transformations form a category
+-------------------------------------------
+
+-- identity natural transformation
+id'[_] : (𝒫 : Psh) → 𝒫 →̇ 𝒫
+id'[_] 𝒫 = record
+  { fun     = λ p → p
+  ; pres-≋  = λ p≋p' → p≋p'
+  ; natural = λ _ _ → ≋[ 𝒫 ]-refl
+  }
+
+id' = λ {𝒫} → id'[ 𝒫 ]
+
+-- composition for natural transformations
 _∘_ : (ψ : 𝒬 →̇ ℛ) → (φ : 𝒫 →̇ 𝒬) → 𝒫 →̇ ℛ
 _∘_ {𝒬} {ℛ} {𝒫} ψ φ = record
   { fun     = ∘-fun
@@ -188,29 +214,25 @@ _[_]' = _∘_
 
 opaque
   ∘-pres-≈̇ : ψ ≈̇ ψ' → φ ≈̇ φ' → ψ ∘ φ ≈̇ ψ' ∘ φ'
-  ∘-pres-≈̇ ψ≈̇ψ' φ≈̇φ' = record { proof = λ p → apply-sq ψ≈̇ψ' (φ≈̇φ' .apply-≋ p) }
-
-  ∘-pres-≈̇-left : ∀ (_ : ψ ≈̇ ψ') (φ : 𝒫 →̇ 𝒬) → ψ ∘ φ ≈̇ ψ' ∘ φ
-  ∘-pres-≈̇-left ψ≈̇ψ' φ = ∘-pres-≈̇ ψ≈̇ψ' (≈̇-refl {x = φ})
-
-  ∘-pres-≈̇-right : ∀ (ψ : 𝒬 →̇ ℛ) (_ : φ ≈̇ φ') → ψ ∘ φ ≈̇ ψ ∘ φ'
-  ∘-pres-≈̇-right ψ φ≈̇φ' = ∘-pres-≈̇ (≈̇-refl {x = ψ}) φ≈̇φ'
+  ∘-pres-≈̇ {ψ = ψ} {ψ' = ψ'} ψ≈̇ψ' φ≈̇φ' = proof-≈̇ (λ p → apply-≈̇' ψ≈̇ψ' (apply-≈̇ φ≈̇φ' p))
 
   ∘-assoc : ∀ (ω : ℛ →̇ 𝒮) (ψ : 𝒬 →̇ ℛ) (φ : 𝒫 →̇ 𝒬) → (ω ∘ ψ) ∘ φ ≈̇ ω ∘ ψ ∘ φ
-  ∘-assoc {_} {ℛ} ω ψ φ = record { proof = λ p → ≋[ ℛ ]-refl }
+  ∘-assoc {_} {ℛ} ω ψ φ = proof-≈̇ (λ p → ≋[ ℛ ]-refl)
 
-id'[_] : (𝒫 : Psh) → 𝒫 →̇ 𝒫
-id'[_] 𝒫 = record
-  { fun     = λ p → p
-  ; pres-≋  = λ p≋p' → p≋p'
-  ; natural = λ _ _ → ≋[ 𝒫 ]-refl
-  }
+  ∘-pres-≈̇-left : ∀ (_ : ψ ≈̇ ψ') (φ : 𝒫 →̇ 𝒬) → ψ ∘ φ ≈̇ ψ' ∘ φ
+  ∘-pres-≈̇-left ψ≈̇ψ' φ = ∘-pres-≈̇ ψ≈̇ψ' ≈̇-refl
 
-id' = λ {𝒫} → id'[ 𝒫 ]
+  ∘-pres-≈̇-left[_,_] : ∀ (ψ ψ' : 𝒬 →̇ ℛ) (_ : ψ ≈̇ ψ') (φ : 𝒫 →̇ 𝒬) → ψ ∘ φ ≈̇ ψ' ∘ φ
+  ∘-pres-≈̇-left[ ψ , ψ' ] = ∘-pres-≈̇-left
 
-opaque
+  ∘-pres-≈̇-right : ∀ (ψ : 𝒬 →̇ ℛ) (_ : φ ≈̇ φ') → ψ ∘ φ ≈̇ ψ ∘ φ'
+  ∘-pres-≈̇-right ψ φ≈̇φ' = ∘-pres-≈̇ ≈̇-refl φ≈̇φ'
+
+  ∘-pres-≈̇-right[_,_] : ∀ (φ φ' : 𝒫 →̇ 𝒬) (ψ : 𝒬 →̇ ℛ) (_ : φ ≈̇ φ') → ψ ∘ φ ≈̇ ψ ∘ φ'
+  ∘-pres-≈̇-right[ φ , φ' ] = ∘-pres-≈̇-right
+
   ∘-unit-left : ∀ {𝒫 : Psh} (𝒬 : Psh) (φ : 𝒫 →̇ 𝒬) → id'[ 𝒬 ] ∘ φ ≈̇ φ
-  ∘-unit-left 𝒬 _ = record { proof = λ p → ≋[ 𝒬 ]-refl }
+  ∘-unit-left 𝒬 _ = proof-≈̇ (λ p → ≋[ 𝒬 ]-refl)
 
   ∘-unit-right : ∀ (𝒫 : Psh) {𝒬 : Psh} (φ : 𝒫 →̇ 𝒬) → φ ∘ id'[ 𝒫 ] ≈̇ φ
-  ∘-unit-right _ {𝒬} _ = record { proof = λ p → ≋[ 𝒬 ]-refl }
+  ∘-unit-right _ {𝒬} _ = proof-≈̇ (λ p → ≋[ 𝒬 ]-refl)

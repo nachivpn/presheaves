@@ -25,7 +25,7 @@ open import Data.Product using () renaming (∃ to Σ)
 
 open import Relation.Binary using (Reflexive; Symmetric; Transitive; IsEquivalence; Setoid)
 open import Relation.Binary.PropositionalEquality.Properties using () renaming (isEquivalence to ≡-equiv)
-import Relation.Binary.Reasoning.Setoid as EqReasoning 
+import Relation.Binary.Reasoning.Setoid as EqReasoning
 
 private
   variable
@@ -61,8 +61,9 @@ unit' = record
 
 unit'[_] = λ ℛ → unit' {ℛ}
 
-Unit'-eta : t ≈̇ unit'
-Unit'-eta {ℛ} {t} = record { proof = λ r → ⊤-eta (t .apply r) (unit'[ ℛ ] .apply r) }
+opaque
+  Unit'-eta : t ≈̇ unit'
+  Unit'-eta {ℛ} {t} = proof-≈̇ (λ r → ⊤-eta (t .apply r) (unit'[ ℛ ] .apply r))
 
 ⊤'-eta = Unit'-eta
 
@@ -131,25 +132,27 @@ module _ {𝒫 𝒬 : Psh} where
 
   opaque
     pair'-pres-≈̇ : t ≈̇ t' → u ≈̇ u' → pair' t u ≈̇ pair' t' u'
-    pair'-pres-≈̇ t≈̇t' u≈̇u' = record { proof = λ r → proof (t≈̇t' .apply-≋ r , u≈̇u' .apply-≋ r) }
+    pair'-pres-≈̇ t≈̇t' u≈̇u' = proof-≈̇ (λ r → proof (apply-≈̇ t≈̇t' r , apply-≈̇ u≈̇u' r))
 
+    pair'-nat : ∀ (t : ℛ →̇ 𝒫) (u : ℛ →̇ 𝒬) (s : ℛ' →̇ ℛ) → pair' t u ∘ s ≈̇ pair' (t ∘ s) (u ∘ s)
+    pair'-nat _t _u _s = proof-≈̇ (λ p → ≋[ 𝒫 ×' 𝒬 ]-refl)
+
+    ×'-beta-left : ∀ {t : ℛ →̇ 𝒫} (u : ℛ →̇ 𝒬) → fst' (pair' t u) ≈̇ t
+    ×'-beta-left {_t} _u = proof-≈̇ (λ _r → ≋[ 𝒫 ]-refl)
+
+    ×'-beta-right : ∀ (t : ℛ →̇ 𝒫) {u : ℛ →̇ 𝒬} → snd' (pair' t u) ≈̇ u
+    ×'-beta-right t {_u} = proof-≈̇ (λ _r → ≋[ 𝒬 ]-refl)
+
+    ×'-eta : t ≈̇ pair' (fst' t) (snd' t)
+    ×'-eta = proof-≈̇ (λ _r → ≋[ 𝒫 ×' 𝒬 ]-refl)
+
+  opaque
     pair'-pres-≈̇-left : t ≈̇ t' → pair' t u ≈̇ pair' t' u
     pair'-pres-≈̇-left {u = u} t≈̇t' = pair'-pres-≈̇ t≈̇t' (≈̇-refl {x = u})
 
     pair'-pres-≈̇-right : u ≈̇ u' → pair' t u ≈̇ pair' t u'
     pair'-pres-≈̇-right {t = t} u≈̇u' = pair'-pres-≈̇ (≈̇-refl {x = t}) u≈̇u'
 
-    pair'-nat : ∀ (t : ℛ →̇ 𝒫) (u : ℛ →̇ 𝒬) (s : ℛ' →̇ ℛ) → pair' t u ∘ s ≈̇ pair' (t ∘ s) (u ∘ s)
-    pair'-nat _t _u _s = record { proof = λ p → ≋[ 𝒫 ×' 𝒬 ]-refl }
-
-    ×'-beta-left : ∀ {t : ℛ →̇ 𝒫} (u : ℛ →̇ 𝒬) → fst' (pair' t u) ≈̇ t
-    ×'-beta-left {_t} _u = record { proof = λ _r → ≋[ 𝒫 ]-refl }
-
-    ×'-beta-right : ∀ (t : ℛ →̇ 𝒫) {u : ℛ →̇ 𝒬} → snd' (pair' t u) ≈̇ u
-    ×'-beta-right t {_u} = record { proof = λ _r → ≋[ 𝒬 ]-refl }
-
-    ×'-eta : t ≈̇ pair' (fst' t) (snd' t)
-    ×'-eta = record { proof = λ _r → ≋[ 𝒫 ×' 𝒬 ]-refl }
 
 π₁'[_] = λ {𝒫} 𝒬 → π₁' {𝒫} {𝒬}
 
@@ -167,16 +170,17 @@ assoc' = ⟨ π₁' ∘ π₁' , ⟨ π₂' ∘ π₁' , π₂' ⟩' ⟩'
 
 opaque
   ×'-map-pres-≈̇ : t ≈̇ t' → u ≈̇ u' → t ×'-map u ≈̇ t' ×'-map u'
-  ×'-map-pres-≈̇ t≈̇t' u≈̇u' = record { proof = λ x → let elem (p , q) = x in proof (t≈̇t' .apply-≋ p , u≈̇u' .apply-≋ q) }
+  ×'-map-pres-≈̇ t≈̇t' u≈̇u' = proof-≈̇ (λ x → let elem (p , q) = x in proof (apply-≈̇ t≈̇t' p , apply-≈̇ u≈̇u' q))
 
+  ×'-map-pres-id : ∀ {𝒫 𝒬 : Psh} → id'[ 𝒫 ] ×'-map id'[ 𝒬 ] ≈̇ id'[ 𝒫 ×' 𝒬 ]
+  ×'-map-pres-id {𝒫} {𝒬} = proof-≈̇ (λ _x → ≋[ 𝒫 ×' 𝒬 ]-refl)
+
+opaque
   ×'-map-pres-≈̇-left : ∀ (_ : t ≈̇ t') (u : 𝒬 →̇ 𝒬') → t ×'-map u ≈̇ t' ×'-map u
   ×'-map-pres-≈̇-left t≈̇t' u = ×'-map-pres-≈̇ t≈̇t' (≈̇-refl {x = u})
 
   ×'-map-pres-≈̇-right : ∀ (t : 𝒫 →̇ 𝒫') (_ : u ≈̇ u') → t ×'-map u ≈̇ t ×'-map u'
   ×'-map-pres-≈̇-right t u≈̇u' = ×'-map-pres-≈̇ (≈̇-refl {x = t}) u≈̇u'
-
-  ×'-map-pres-id : ∀ {𝒫 𝒬 : Psh} → id'[ 𝒫 ] ×'-map id'[ 𝒬 ] ≈̇ id'[ 𝒫 ×' 𝒬 ]
-  ×'-map-pres-id {𝒫} {𝒬} = record { proof = λ _x → ≋[ 𝒫 ×' 𝒬 ]-refl }
 
 --
 -- Exponentials
@@ -247,16 +251,16 @@ module _ {𝒫 𝒬 : Psh} where
 
   opaque
     app'-pres-≈̇ : t ≈̇ t' → u ≈̇ u' → app' t u ≈̇ app' t' u'
-    app'-pres-≈̇ t≈̇t' u≈̇u' = record { proof = λ r → →'-≋-apply-sq (t≈̇t' .apply-≋ r) ⊆-refl (u≈̇u' .apply-≋ r) }
+    app'-pres-≈̇ t≈̇t' u≈̇u' = proof-≈̇ (λ r → →'-≋-apply-sq (apply-≈̇ t≈̇t' r) ⊆-refl (apply-≈̇ u≈̇u' r))
+
+    app'-nat : ∀ (t : ℛ →̇ 𝒫 →' 𝒬) (u : ℛ →̇ 𝒫) (s : ℛ' →̇ ℛ) → app' t u ∘ s ≈̇ app' (t ∘ s) (u ∘ s)
+    app'-nat _t _u _s = proof-≈̇ (λ _r' → ≋[ 𝒬 ]-refl)
 
     app'-pres-≈̇-left : ∀ (_ : t ≈̇ t') (u : ℛ →̇ 𝒫) → app' t u ≈̇ app' t' u
     app'-pres-≈̇-left t≈̇t' u = app'-pres-≈̇ t≈̇t' (≈̇-refl {x = u})
 
     app'-pres-≈̇-right : ∀ (t : ℛ →̇ 𝒫 →' 𝒬) (_ : u ≈̇ u') → app' t u ≈̇ app' t u'
     app'-pres-≈̇-right t u≈̇u' = app'-pres-≈̇ (≈̇-refl {x = t}) u≈̇u'
-
-    app'-nat : ∀ (t : ℛ →̇ 𝒫 →' 𝒬) (u : ℛ →̇ 𝒫) (s : ℛ' →̇ ℛ) → app' t u ∘ s ≈̇ app' (t ∘ s) (u ∘ s)
-    app'-nat _t _u _s = record { proof = λ _r' → ≋[ 𝒬 ]-refl }
 
 lam' : (t : ℛ ×' 𝒫 →̇ 𝒬) → ℛ →̇ 𝒫 →' 𝒬
 lam' {ℛ} {𝒫} {𝒬} t = record
@@ -274,20 +278,18 @@ lam' {ℛ} {𝒫} {𝒬} t = record
 
 opaque
   lam'-pres-≈̇ : t ≈̇ t' → lam' t ≈̇ lam' t'
-  lam'-pres-≈̇ {_𝒬} {ℛ} {𝒫} t≈̇t' = record { proof = λ r → proof (λ i p → t≈̇t' .apply-≋ (elem (wk[ ℛ ] i r , p))) }
+  lam'-pres-≈̇ {_𝒬} {ℛ} {𝒫} t≈̇t' = proof-≈̇ (λ r → proof (λ i p → apply-≈̇ t≈̇t' (elem (wk[ ℛ ] i r , p))))
 
   lam'-nat : ∀ (t : ℛ ×' 𝒫 →̇ 𝒬) (s : ℛ' →̇ ℛ) → lam' t ∘ s ≈̇ lam' (t ∘ s ×'-map id'[ 𝒫 ])
-  lam'-nat {_ℛ} {𝒫} {_𝒬} {_ℛ'} t s = record { proof = λ r' → proof (λ i p → t .apply-≋ (proof ((s .natural i r') , ≋[ 𝒫 ]-refl))) }
+  lam'-nat {_ℛ} {𝒫} {_𝒬} {_ℛ'} t s = proof-≈̇ (λ r' → proof (λ i p → t .apply-≋ (proof ((s .natural i r') , ≋[ 𝒫 ]-refl))))
 
   →'-beta : ∀ (t : ℛ ×' 𝒫 →̇ 𝒬) (u : ℛ →̇ 𝒫) → app' (lam' t) u ≈̇ t [ pair' id' u ]'
-  →'-beta {ℛ} {𝒫} t u = record { proof = λ r → t .apply-≋ (proof (wk[ ℛ ]-pres-refl r , ≋[ 𝒫 ]-refl)) }
+  →'-beta {ℛ} {𝒫} t u = proof-≈̇ (λ r → t .apply-≋ (proof (wk[ ℛ ]-pres-refl r , ≋[ 𝒫 ]-refl)))
 
   →'-eta : ∀ (t : ℛ →̇ 𝒫 →' 𝒬) → t ≈̇ lam' {𝒬 = 𝒬} (app' (t [ π₁'[ 𝒫 ] ]') π₂'[ ℛ ])
-  →'-eta {ℛ} {𝒫} {𝒬} t = record
-    { proof = λ r → proof (λ i p → let open EqReasoning ≋[ 𝒬 ]-setoid in begin
+  →'-eta {ℛ} {𝒫} {𝒬} t = proof-≈̇ (λ r → proof (λ i p → let open EqReasoning ≋[ 𝒬 ]-setoid in begin
                              t .apply r .apply i p                        ≡˘⟨ cong (λ hole → t .apply r .apply hole p) (⊆-trans-unit-right i) ⟩
                              t .apply r .apply (⊆-trans i ⊆-refl) p       ≡⟨⟩
                              wk[ 𝒫 →' 𝒬 ] i (t .apply r) .apply ⊆-refl p  ≈⟨ t .natural i r .pw ⊆-refl p ⟩
                              t .apply (wk[ ℛ ] i r) .apply ⊆-refl p       ∎
-                          )
-    }
+                          ))

@@ -41,8 +41,8 @@ module Pointed (PDF : PointedDFrame) (IPDF : InclusivePointedDFrame IDF PDF) whe
     unfolding ◇-map_
 
     ◇-strong-point : strength[ 𝒫 , 𝒬 ] ∘ id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]
-    ◇-strong-point {𝒫} {𝒬} = record { proof = λ _ → proof (≡-refl , ≡-refl
-      , proof (wk[ 𝒫 ]-pres-≡-≋ R-to-⊆-pres-R-point ≋[ 𝒫 ]-refl , ≋[ 𝒬 ]-refl)) }
+    ◇-strong-point {𝒫} {𝒬} = proof-≈̇ (λ _ → proof (≡-refl , ≡-refl
+      , proof (wk[ 𝒫 ]-pres-≡-≋ R-to-⊆-pres-R-point ≋[ 𝒫 ]-refl , ≋[ 𝒬 ]-refl)))
 
 module Reflexive (RDF : ReflexiveDFrame) (IRDF : InclusiveReflexiveDFrame IDF RDF) where
 
@@ -54,7 +54,7 @@ module Reflexive (RDF : ReflexiveDFrame) (IRDF : InclusiveReflexiveDFrame IDF RD
 
   opaque
     ◇-strong-point : strength[ 𝒫 , 𝒬 ] ∘ id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]
-    ◇-strong-point {𝒫} {𝒬} = record { proof = λ p×◇q → let p = π₁' .apply p×◇q in proof
+    ◇-strong-point {𝒫} {𝒬} = proof-≈̇ (λ p×◇q → let p = π₁' .apply p×◇q in proof
       (≡-refl
       , ≡-refl
       , proof
@@ -62,4 +62,4 @@ module Reflexive (RDF : ReflexiveDFrame) (IRDF : InclusiveReflexiveDFrame IDF RD
           wk[ 𝒫 ] (R-to-⊆ R-refl) p   ≡⟨ cong₂ wk[ 𝒫 ] R-to-⊆-pres-refl ≡-refl ⟩
           wk[ 𝒫 ] (⊆-refl) p          ≈⟨ wk[ 𝒫 ]-pres-refl p ⟩
           p                           ∎)
-        , ≋[ 𝒬 ]-refl)) }
+        , ≋[ 𝒬 ]-refl)))

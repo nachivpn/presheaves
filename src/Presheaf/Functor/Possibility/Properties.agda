@@ -179,6 +179,17 @@ opaque
 η = λ {𝒫} → η[ 𝒫 ]
 ϵ = λ {𝒫} → ϵ[ 𝒫 ]
 
+opaque
+  unfolding ◼-map_ ◇-map_
+
+  zig-zag₁ : ϵ[ ◇ 𝒫 ] ∘ ◇-map η[ 𝒫 ] ≈̇  id'[ ◇ 𝒫 ]
+  zig-zag₁ {𝒫} = proof-≈̇ (λ _p
+    → proof (≡-refl , ≡-refl , wk[ 𝒫 ]-pres-refl _))
+
+  zig-zag₂ : ◼-map ϵ[ 𝒫 ] ∘ η[ ◼ 𝒫 ] ≈̇ id'[ ◼ 𝒫 ]
+  zig-zag₂ {𝒫} = proof-≈̇ λ bp → proof-≈̇ λ d
+    → bp .apply-≋ (proof (≡-refl , ≡-refl , ⊆-trans-unit-right _))
+
 --
 -- Hom-set based characterisation of the adjunction
 --

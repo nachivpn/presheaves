@@ -9,7 +9,7 @@ module Presheaf.Functor.Possibility.Pointed
   {IF   : IFrame W _⊆_}
   {_R_  : (w v : W) → Set}
   (let open FDF IF _R_)
-  {DF   : DFrame}
+  (DF   : DFrame)
   (let open Definitions DF)
   where
 

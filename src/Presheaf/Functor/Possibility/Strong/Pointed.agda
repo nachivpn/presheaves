@@ -20,6 +20,7 @@ open import Presheaf.Base IF
 open import Presheaf.CartesianClosure IF
 open import Presheaf.Functor.Possibility.Base DF
 open import Presheaf.Functor.Possibility.Strong.Base IDF
+open import Presheaf.Functor.Possibility.Pointed DF
 
 open import Relation.Binary.PropositionalEquality using (_≡_ ; cong ; cong₂) renaming (refl to ≡-refl ; sym to ≡-sym)
 open import Data.Product using (_,_) renaming (proj₁ to fst ; proj₂ to snd)
@@ -29,12 +30,11 @@ private
   variable
     𝒫 𝒫' 𝒬 𝒬' : Psh
 
-module Pointed (PDF : PointedDFrame) (IPDF : InclusivePointedDFrame IDF PDF) where
+module StrongPointed (PDF : PointedDFrame) (IPDF : InclusivePointedDFrame IDF PDF) where
 
   open PointedDFrame PDF
   open InclusivePointedDFrame IPDF
 
-  open import Presheaf.Functor.Possibility.Pointed
   open Pointed PDF
 
   opaque
@@ -44,12 +44,11 @@ module Pointed (PDF : PointedDFrame) (IPDF : InclusivePointedDFrame IDF PDF) whe
     ◇-strong-point {𝒫} {𝒬} = proof-≈̇ (λ _ → proof (≡-refl , ≡-refl
       , proof (wk[ 𝒫 ]-pres-≡-≋ R-to-⊆-pres-R-point ≋[ 𝒫 ]-refl , ≋[ 𝒬 ]-refl)))
 
-module Reflexive (RDF : ReflexiveDFrame) (IRDF : InclusiveReflexiveDFrame IDF RDF) where
+module InclusiveReflexive (RDF : ReflexiveDFrame) (IRDF : InclusiveReflexiveDFrame IDF RDF) where
 
   open ReflexiveDFrame RDF
   open InclusiveReflexiveDFrame IRDF
 
-  open import Presheaf.Functor.Possibility.Pointed
   open Reflexive RDF
 
   opaque

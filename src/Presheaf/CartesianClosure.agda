@@ -1,6 +1,6 @@
 {-# OPTIONS --safe --without-K #-}
 
-open import Kripke.IFrame
+open import Frame.IFrame
 
 module Presheaf.CartesianClosure
   {W   : Set}

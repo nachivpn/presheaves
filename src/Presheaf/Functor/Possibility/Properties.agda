@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --without-K #-}
 
-open import Kripke.IFrame
-import Kripke.FDFrame as FDF
+open import Frame.IFrame
+import Frame.FDFrame as FDF
 
 module Presheaf.Functor.Possibility.Properties
   {W    : Set}
@@ -18,7 +18,7 @@ open import Presheaf.CartesianClosure IF
 open import Presheaf.Functor.Possibility.Base DF
 
 open DFrame DF
-open import Kripke.FDFrame.Properties DF
+open import Frame.FDFrame.Properties DF
 
 open import PUtil
 

@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --without-K #-}
 
-open import Kripke.IFrame
-import Kripke.FDFrame as FDF
+open import Frame.IFrame
+import Frame.FDFrame as FDF
 
 module Presheaf.Functor.Possibility.Strong.Base
   {W   : Set}

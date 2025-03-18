@@ -1,6 +1,6 @@
 {-# OPTIONS --safe --without-K #-}
 
-open import Kripke.IFrame
+open import Frame.IFrame
 
 open import Relation.Binary.PropositionalEquality
   using (_≡_; subst; cong; cong₂)

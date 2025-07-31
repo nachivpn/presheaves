@@ -17,5 +17,3 @@ open import Presheaf.Functor.Possibility.Strong.Pointed
 open import Presheaf.Functor.Possibility.Strong.Joinable
 
 open import Presheaf.Functor.Lax
-
-

@@ -69,7 +69,7 @@ opaque
   -⊇-mapᵒ-pres-refl : -⊇-mapᵒ ⊆-refl[ w ] ≈̇ id'
   -⊇-mapᵒ-pres-refl = proof-≈̇ ⊆-trans-unit-left
 
-  -⊇-mapᵒ-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') → -⊇-mapᵒ (⊆-trans i i') ≈̇ -⊇-mapᵒ i ∘ -⊇-mapᵒ i'
+  -⊇-mapᵒ-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') → -⊇-mapᵒ (⊆-trans i i') ≈̇ -⊇-mapᵒ i ∘' -⊇-mapᵒ i'
   -⊇-mapᵒ-pres-trans i i' = proof-≈̇ (⊆-trans-assoc i i')
 
 --
@@ -82,39 +82,39 @@ opaque
   { Fam           = λ w → Hom (-⊇ w) 𝒫
   ; _≋_           = _≈̇_
   ; ≋-equiv       = λ _ → ≈̇-equiv
-  ; wk            = λ i f → f ∘ (-⊇-mapᵒ i)
+  ; wk            = λ i f → f ∘' (-⊇-mapᵒ i)
   ; wk-pres-≋     = wk-pres-≋
   ; wk-pres-refl  = wk-pres-refl
   ; wk-pres-trans = wk-pres-trans
   }
   where
     opaque
-      wk-pres-≋ : (i : w ⊆ v) {f g : Hom (-⊇ w) 𝒫} → f ≈̇ g → f ∘ -⊇-mapᵒ i ≈̇ g ∘ -⊇-mapᵒ i
-      wk-pres-≋ i x≋y = ∘-pres-≈̇-left x≋y (-⊇-mapᵒ i)
+      wk-pres-≋ : (i : w ⊆ v) {f g : Hom (-⊇ w) 𝒫} → f ≈̇ g → f ∘' -⊇-mapᵒ i ≈̇ g ∘' -⊇-mapᵒ i
+      wk-pres-≋ i x≋y = ∘'-pres-≈̇-left x≋y (-⊇-mapᵒ i)
 
-      wk-pres-refl : (f : Hom (-⊇ w) 𝒫) → f ∘ -⊇-mapᵒ ⊆-refl ≈̇ f
-      wk-pres-refl f = ≈̇-trans (∘-pres-≈̇-right f -⊇-mapᵒ-pres-refl) (∘-unit-right _ f)
+      wk-pres-refl : (f : Hom (-⊇ w) 𝒫) → f ∘' -⊇-mapᵒ ⊆-refl ≈̇ f
+      wk-pres-refl f = ≈̇-trans (∘'-pres-≈̇-right f -⊇-mapᵒ-pres-refl) (∘'-unit-right _ f)
 
-      wk-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') (f : Hom (-⊇ w) 𝒫) → f ∘ -⊇-mapᵒ (⊆-trans i i') ≈̇ (f ∘ -⊇-mapᵒ i) ∘ -⊇-mapᵒ i'
-      wk-pres-trans i i' f = ≈̇-trans (∘-pres-≈̇-right f (-⊇-mapᵒ-pres-trans i i')) (≈̇-sym (∘-assoc f (-⊇-mapᵒ i) (-⊇-mapᵒ i')) )
+      wk-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') (f : Hom (-⊇ w) 𝒫) → f ∘' -⊇-mapᵒ (⊆-trans i i') ≈̇ (f ∘' -⊇-mapᵒ i) ∘' -⊇-mapᵒ i'
+      wk-pres-trans i i' f = ≈̇-trans (∘'-pres-≈̇-right f (-⊇-mapᵒ-pres-trans i i')) (≈̇-sym (∘'-assoc f (-⊇-mapᵒ i) (-⊇-mapᵒ i')) )
 
 
 opaque
   ◻ᵢ-map_ : {𝒫 𝒬 : Psh} → (t : 𝒫 →̇ 𝒬) → (◻ᵢ 𝒫 →̇ ◻ᵢ 𝒬)
   ◻ᵢ-map_ {𝒫} {𝒬} t = record
-    { fun     = t ∘_
-    ; pres-≋  = ∘-pres-≈̇-right t
+    { fun     = t ∘'_
+    ; pres-≋  = ∘'-pres-≈̇-right t
     ; natural = λ i f → proof-≈̇ (λ d → ≋[ 𝒬 ]-refl)
     }
 
   ◻ᵢ-map-pres-≈̇ : {𝒫 𝒬 : Psh} {f g : 𝒫 →̇ 𝒬} → f ≈̇ g → ◻ᵢ-map f ≈̇ ◻ᵢ-map g
-  ◻ᵢ-map-pres-≈̇ f≈̇g = proof-≈̇ (∘-pres-≈̇-left f≈̇g)
+  ◻ᵢ-map-pres-≈̇ f≈̇g = proof-≈̇ (∘'-pres-≈̇-left f≈̇g)
 
   ◻ᵢ-map-pres-id : {𝒫 : Psh} → ◻ᵢ-map id'[ 𝒫 ] ≈̇ id'
-  ◻ᵢ-map-pres-id = proof-≈̇ (∘-unit-left _)
+  ◻ᵢ-map-pres-id = proof-≈̇ (∘'-unit-left _)
 
-  ◻ᵢ-map-pres-∘ : {𝒫 𝒬 ℛ : Psh} (t' : 𝒬 →̇ ℛ) (t : 𝒫 →̇ 𝒬) → ◻ᵢ-map (t' ∘ t) ≈̇ ◻ᵢ-map t' ∘ ◻ᵢ-map t
-  ◻ᵢ-map-pres-∘ t' t = proof-≈̇ (∘-assoc t' t)
+  ◻ᵢ-map-pres-∘' : {𝒫 𝒬 ℛ : Psh} (t' : 𝒬 →̇ ℛ) (t : 𝒫 →̇ 𝒬) → ◻ᵢ-map (t' ∘' t) ≈̇ ◻ᵢ-map t' ∘' ◻ᵢ-map t
+  ◻ᵢ-map-pres-∘' t' t = proof-≈̇ (∘'-assoc t' t)
 
 
 -- wk[_] with arguments flipped
@@ -142,7 +142,7 @@ wk[_]' 𝒫 = record
 opaque
   unfolding ◻ᵢ-map_
 
-  wk'-natural : (t : 𝒫 →̇ 𝒬) → wk[ 𝒬 ]' ∘ t ≈̇ (◻ᵢ-map t) ∘ wk[ 𝒫 ]'
+  wk'-natural : (t : 𝒫 →̇ 𝒬) → wk[ 𝒬 ]' ∘' t ≈̇ (◻ᵢ-map t) ∘' wk[ 𝒫 ]'
   wk'-natural t = proof-≈̇ (λ p → proof-≈̇ (λ i → t .natural i p))
 
 copointᵢ[_] : ∀ 𝒫 → ◻ᵢ 𝒫 →̇ 𝒫

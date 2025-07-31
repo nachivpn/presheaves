@@ -137,7 +137,7 @@ opaque
   ◯-map-pres-id : ◯-map id'[ 𝒫 ] ≈̇ id'
   ◯-map-pres-id = proof-≈̇ λ _p → proof λ _i → ◇-≋-refl
 
-  ◯-map-pres-∘ : (t' : 𝒬 →̇ ℛ) (t : 𝒫 →̇ 𝒬) → ◯-map (t' ∘ t) ≈̇ ◯-map t' ∘ ◯-map t
+  ◯-map-pres-∘ : (t' : 𝒬 →̇ ℛ) (t : 𝒫 →̇ 𝒬) → ◯-map (t' ∘' t) ≈̇ ◯-map t' ∘' ◯-map t
   ◯-map-pres-∘ _t' _t = proof-≈̇ λ _p → proof λ i → ◇-≋-refl
 
 -------------------------------------------------------
@@ -161,7 +161,7 @@ module ◯≅◇ where
       wk[ ◯ 𝒫 ] i p .apply-◯ ⊆-refl ∎ }
 
   -- ◯≅◇-forth[_] is a natural transformation (in the category of presheaf functors)
-  ◯≅◇-forth-nat : (f : 𝒫 →̇ 𝒬) → ◯≅◇-forth[ 𝒬 ] ∘ ◯-map f ≈̇  (◇-map f) ∘ ◯≅◇-forth[ 𝒫 ]
+  ◯≅◇-forth-nat : (f : 𝒫 →̇ 𝒬) → ◯≅◇-forth[ 𝒬 ] ∘' ◯-map f ≈̇  (◇-map f) ∘' ◯≅◇-forth[ 𝒫 ]
   ◯≅◇-forth-nat {𝒫} {𝒬} f = proof-≈̇ λ p → ◇-≋-refl
 
   ◯≅◇-back[_] : (𝒫 : Psh) → ◇ 𝒫 →̇ ◯ 𝒫
@@ -173,7 +173,7 @@ module ◯≅◇ where
     ; natural = λ i ◇p → proof (λ i' → wk[ ◇ 𝒫 ]-pres-trans i i' ◇p) }
 
   -- ◯≅◇-back[_] is a natural transformation (in the category of presheaf functors)
-  ◯≅◇-back-nat : (f : 𝒫 →̇ 𝒬) → ◯≅◇-back[ 𝒬 ] ∘ ◇-map f ≈̇  (◯-map f) ∘ ◯≅◇-back[ 𝒫 ]
+  ◯≅◇-back-nat : (f : 𝒫 →̇ 𝒬) → ◯≅◇-back[ 𝒬 ] ∘' ◇-map f ≈̇  (◯-map f) ∘' ◯≅◇-back[ 𝒫 ]
   ◯≅◇-back-nat {𝒫} {𝒬} f = proof-≈̇ λ p → proof λ i →
     let open EqReasoning ≋[ ◇ 𝒬 ]-setoid in begin
       wk[ ◇ 𝒬 ] i ((◇-map f) .apply p)
@@ -184,7 +184,7 @@ module ◯≅◇ where
   -- ◯≅◇-forth and ◯≅◇-back are component-wise isomorphic
   --
 
-  ◯≅◇-back-left-inverse : ◯≅◇-back[ 𝒫 ] ∘ ◯≅◇-forth[ 𝒫 ] ≈̇ id'[ ◯ 𝒫 ]
+  ◯≅◇-back-left-inverse : ◯≅◇-back[ 𝒫 ] ∘' ◯≅◇-forth[ 𝒫 ] ≈̇ id'[ ◯ 𝒫 ]
   ◯≅◇-back-left-inverse {𝒫} = proof-≈̇ λ p → proof λ i →
     let open EqReasoning ≋[ ◇ 𝒫 ]-setoid in begin
         wk[ ◇ 𝒫 ] i (p .apply-◯ ⊆-refl)
@@ -194,5 +194,5 @@ module ◯≅◇ where
         p .apply-◯ i ∎
 
 
-  ◯≅◇-back-right-inverse : ◯≅◇-forth[ 𝒫 ] ∘ ◯≅◇-back[ 𝒫 ] ≈̇ id'[ ◇ 𝒫 ]
+  ◯≅◇-back-right-inverse : ◯≅◇-forth[ 𝒫 ] ∘' ◯≅◇-back[ 𝒫 ] ≈̇ id'[ ◇ 𝒫 ]
   ◯≅◇-back-right-inverse {𝒫} = proof-≈̇ wk[ ◇ 𝒫 ]-pres-refl

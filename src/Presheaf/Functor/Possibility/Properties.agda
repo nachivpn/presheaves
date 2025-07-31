@@ -53,7 +53,7 @@ opaque
   -D-mapᵒ-pres-refl : -D-mapᵒ ⊆-refl[ w ] ≈̇ id'
   -D-mapᵒ-pres-refl = ≈̇-trans (◇-map-pres-≈̇ -⊇-mapᵒ-pres-refl) ◇-map-pres-id
 
-  -D-mapᵒ-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') → -D-mapᵒ (⊆-trans i i') ≈̇ -D-mapᵒ i ∘ -D-mapᵒ i'
+  -D-mapᵒ-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') → -D-mapᵒ (⊆-trans i i') ≈̇ -D-mapᵒ i ∘' -D-mapᵒ i'
   -D-mapᵒ-pres-trans i i' = ≈̇-trans (◇-map-pres-≈̇ (-⊇-mapᵒ-pres-trans i i')) (◇-map-pres-∘ (-⊇-mapᵒ i) (-⊇-mapᵒ i'))
 
 -- observe:
@@ -73,43 +73,43 @@ _ = triple
   { Fam           = λ v → Hom (-D v) 𝒫
   ; _≋_           = _≈̇_
   ; ≋-equiv       = λ _ → ≈̇-equiv
-  ; wk            = λ i f → f ∘ -D-mapᵒ i
+  ; wk            = λ i f → f ∘' -D-mapᵒ i
   ; wk-pres-≋     = wk-pres-≋
   ; wk-pres-refl  = wk-pres-refl
   ; wk-pres-trans = wk-pres-trans
   }
   where
     opaque
-      wk-pres-≋ : (i : w ⊆ v) {x y : Hom (-D w) 𝒫} → x ≈̇ y → x ∘ -D-mapᵒ i ≈̇ y ∘ -D-mapᵒ i
-      wk-pres-≋ i x≋y = ∘-pres-≈̇-left x≋y (-D-mapᵒ i)
+      wk-pres-≋ : (i : w ⊆ v) {x y : Hom (-D w) 𝒫} → x ≈̇ y → x ∘' -D-mapᵒ i ≈̇ y ∘' -D-mapᵒ i
+      wk-pres-≋ i x≋y = ∘'-pres-≈̇-left x≋y (-D-mapᵒ i)
 
-      wk-pres-refl : (f : Hom (-D w) 𝒫) → f ∘ -D-mapᵒ ⊆-refl ≈̇ f
-      wk-pres-refl f = ≈̇-trans (∘-pres-≈̇-right f -D-mapᵒ-pres-refl) (∘-unit-right _ f)
+      wk-pres-refl : (f : Hom (-D w) 𝒫) → f ∘' -D-mapᵒ ⊆-refl ≈̇ f
+      wk-pres-refl f = ≈̇-trans (∘'-pres-≈̇-right f -D-mapᵒ-pres-refl) (∘'-unit-right _ f)
 
-      wk-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') (f : Hom (-D w) 𝒫) → f ∘ -D-mapᵒ (⊆-trans i i') ≈̇ (f ∘ -D-mapᵒ i) ∘ -D-mapᵒ i'
-      wk-pres-trans i i' f = ≈̇-trans (∘-pres-≈̇-right f (-D-mapᵒ-pres-trans i i')) (≈̇-sym (∘-assoc f (-D-mapᵒ i) (-D-mapᵒ i')) )
+      wk-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') (f : Hom (-D w) 𝒫) → f ∘' -D-mapᵒ (⊆-trans i i') ≈̇ (f ∘' -D-mapᵒ i) ∘' -D-mapᵒ i'
+      wk-pres-trans i i' f = ≈̇-trans (∘'-pres-≈̇-right f (-D-mapᵒ-pres-trans i i')) (≈̇-sym (∘'-assoc f (-D-mapᵒ i) (-D-mapᵒ i')) )
 
 -- made opaque to speedup type-checking and relying on implementation details
 opaque
   ◼-map_ : {𝒫 𝒬 : Psh} → (t : 𝒫 →̇ 𝒬) → (◼ 𝒫 →̇ ◼ 𝒬)
   ◼-map_ {𝒫} {𝒬} t = record
-    { fun     = t ∘_
-    ; pres-≋  = ∘-pres-≈̇-right t
+    { fun     = t ∘'_
+    ; pres-≋  = ∘'-pres-≈̇-right t
     ; natural = ◼-map-fun-natural
     }
     where
       opaque
-        ◼-map-fun-natural : Natural (◼ 𝒫) (◼ 𝒬) (t ∘_)
+        ◼-map-fun-natural : Natural (◼ 𝒫) (◼ 𝒬) (t ∘'_)
         ◼-map-fun-natural i f = proof-≈̇ (λ d → ≋[ 𝒬 ]-refl)
 
   ◼-map-pres-≈̇ : {𝒫 𝒬 : Psh} {f g : 𝒫 →̇ 𝒬} → f ≈̇ g → ◼-map f ≈̇ ◼-map g
-  ◼-map-pres-≈̇ f≈̇g = proof-≈̇ (∘-pres-≈̇-left f≈̇g)
+  ◼-map-pres-≈̇ f≈̇g = proof-≈̇ (∘'-pres-≈̇-left f≈̇g)
 
   ◼-map-pres-id : {𝒫 : Psh} → ◼-map id'[ 𝒫 ] ≈̇ id'
-  ◼-map-pres-id = proof-≈̇ (∘-unit-left _)
+  ◼-map-pres-id = proof-≈̇ (∘'-unit-left _)
 
-  ◼-map-pres-∘ : {𝒫 𝒬 ℛ : Psh} (t' : 𝒬 →̇ ℛ) (t : 𝒫 →̇ 𝒬) → ◼-map (t' ∘ t) ≈̇ ◼-map t' ∘ ◼-map t
-  ◼-map-pres-∘ t' t = proof-≈̇ (∘-assoc t' t)
+  ◼-map-pres-∘' : {𝒫 𝒬 ℛ : Psh} (t' : 𝒬 →̇ ℛ) (t : 𝒫 →̇ 𝒬) → ◼-map (t' ∘' t) ≈̇ ◼-map t' ∘' ◼-map t
+  ◼-map-pres-∘' t' t = proof-≈̇ (∘'-assoc t' t)
 
 ---------
 -- ◇ ⊣ ◼
@@ -141,7 +141,7 @@ opaque
 opaque
   unfolding ◼-map_ ◇-map_
 
-  η-natural : (t : 𝒫 →̇ 𝒬) → η[ 𝒬 ] ∘ t ≈̇ ◼-map (◇-map t) ∘ η[ 𝒫 ]
+  η-natural : (t : 𝒫 →̇ 𝒬) → η[ 𝒬 ] ∘' t ≈̇ ◼-map (◇-map t) ∘' η[ 𝒫 ]
   η-natural {𝒫} {𝒬} t = proof-≈̇ (λ p → proof-≈̇ (λ (elem (_ , _ , i)) → proof (≡-refl , ≡-refl , t .natural i p)))
 
 --
@@ -173,7 +173,7 @@ opaque
 opaque
   unfolding ◼-map_ ◇-map_
 
-  ϵ-natural : (t : 𝒫 →̇ 𝒬) → t ∘ ϵ[ 𝒫 ] ≈̇ ϵ[ 𝒬 ] ∘ (◇-map (◼-map t))
+  ϵ-natural : (t : 𝒫 →̇ 𝒬) → t ∘' ϵ[ 𝒫 ] ≈̇ ϵ[ 𝒬 ] ∘' (◇-map (◼-map t))
   ϵ-natural {𝒫} {𝒬} t = proof-≈̇ (λ p → ≋[ 𝒬 ]-refl)
 
 η = λ {𝒫} → η[ 𝒫 ]
@@ -182,11 +182,11 @@ opaque
 opaque
   unfolding ◼-map_ ◇-map_
 
-  zig-zag₁ : ϵ[ ◇ 𝒫 ] ∘ ◇-map η[ 𝒫 ] ≈̇  id'[ ◇ 𝒫 ]
+  zig-zag₁ : ϵ[ ◇ 𝒫 ] ∘' ◇-map η[ 𝒫 ] ≈̇  id'[ ◇ 𝒫 ]
   zig-zag₁ {𝒫} = proof-≈̇ (λ _p
     → proof (≡-refl , ≡-refl , wk[ 𝒫 ]-pres-refl _))
 
-  zig-zag₂ : ◼-map ϵ[ 𝒫 ] ∘ η[ ◼ 𝒫 ] ≈̇ id'[ ◼ 𝒫 ]
+  zig-zag₂ : ◼-map ϵ[ 𝒫 ] ∘' η[ ◼ 𝒫 ] ≈̇ id'[ ◼ 𝒫 ]
   zig-zag₂ {𝒫} = proof-≈̇ λ bp → proof-≈̇ λ d
     → bp .apply-≋ (proof (≡-refl , ≡-refl , ⊆-trans-unit-right _))
 
@@ -197,21 +197,21 @@ opaque
 module HomAdj where
 
   box : (◇ 𝒫 →̇ 𝒬) → (𝒫 →̇ ◼ 𝒬)
-  box {𝒫} {𝒬} t = ◼-map t ∘ η[ 𝒫 ]
+  box {𝒫} {𝒬} t = ◼-map t ∘' η[ 𝒫 ]
 
   unbox : (𝒫 →̇ ◼ 𝒬) → (◇ 𝒫 →̇ 𝒬)
-  unbox {𝒫} {𝒬} t = ϵ[ 𝒬 ] ∘ ◇-map t
+  unbox {𝒫} {𝒬} t = ϵ[ 𝒬 ] ∘' ◇-map t
 
   opaque
-    box-natural : (t : ◇ 𝒫 →̇ 𝒬) (u : 𝒫' →̇ 𝒫) → box t ∘ u ≈̇ box (t ∘ (◇-map u))
+    box-natural : (t : ◇ 𝒫 →̇ 𝒬) (u : 𝒫' →̇ 𝒫) → box t ∘' u ≈̇ box (t ∘' (◇-map u))
     box-natural {𝒫} {𝒬} {𝒫'} t u = let open EqReasoning (→̇-setoid 𝒫' (◼ 𝒬)) in begin
-      (◼-map t ∘ η[ 𝒫 ]) ∘ u
-        ≈⟨ ∘-assoc (◼-map t) η u ⟩
-      ◼-map t ∘ (η[ 𝒫 ] ∘ u)
-        ≈⟨ ∘-pres-≈̇-right (◼-map t) (η-natural u) ⟩
-      ◼-map t ∘ (◼-map (◇-map u) ∘ η[ 𝒫' ])
-        ≈˘⟨ ∘-assoc (◼-map t) (◼-map (◇-map u)) η[ 𝒫' ] ⟩
-      (◼-map t ∘ ◼-map (◇-map u)) ∘ η[ 𝒫' ]
-        ≈˘⟨ ∘-pres-≈̇-left (◼-map-pres-∘ t (◇-map u)) η[ 𝒫' ] ⟩
-      ◼-map (t ∘ ◇-map u) ∘ η[ 𝒫' ]
+      (◼-map t ∘' η[ 𝒫 ]) ∘' u
+        ≈⟨ ∘'-assoc (◼-map t) η u ⟩
+      ◼-map t ∘' (η[ 𝒫 ] ∘' u)
+        ≈⟨ ∘'-pres-≈̇-right (◼-map t) (η-natural u) ⟩
+      ◼-map t ∘' (◼-map (◇-map u) ∘' η[ 𝒫' ])
+        ≈˘⟨ ∘'-assoc (◼-map t) (◼-map (◇-map u)) η[ 𝒫' ] ⟩
+      (◼-map t ∘' ◼-map (◇-map u)) ∘' η[ 𝒫' ]
+        ≈˘⟨ ∘'-pres-≈̇-left (◼-map-pres-∘' t (◇-map u)) η[ 𝒫' ] ⟩
+      ◼-map (t ∘' ◇-map u) ∘' η[ 𝒫' ]
         ∎

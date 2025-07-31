@@ -41,7 +41,7 @@ module InclusiveJoinable (TDF : JoinableDFrame) (ITDF : InclusiveJoinableDFrame 
   opaque
     unfolding ◇-map_
     
-    ◇-strong-join : join[ 𝒫 ×' 𝒬 ] ∘ (◇-map strength[ 𝒫 , 𝒬 ]) ∘ strength[ 𝒫 , ◇ 𝒬 ] ≈̇ strength[ 𝒫 , 𝒬 ] ∘ (id'[ 𝒫 ] ×'-map join[ 𝒬 ])
+    ◇-strong-join : join[ 𝒫 ×' 𝒬 ] ∘' (◇-map strength[ 𝒫 , 𝒬 ]) ∘' strength[ 𝒫 , ◇ 𝒬 ] ≈̇ strength[ 𝒫 , 𝒬 ] ∘' (id'[ 𝒫 ] ×'-map join[ 𝒬 ])
     ◇-strong-join {𝒫} {𝒬} = proof-≈̇ (λ x → proof (≡-refl , ≡-refl , proof ((let open EqReasoning ≋[ 𝒫 ]-setoid in begin
       wk[ 𝒫 ] (wit⊆ (R-join _ _)) (wk[ 𝒫 ] (R-to-⊆ _) (wk[ 𝒫 ] (R-to-⊆ _) (π₁' .apply x)))
         ≈˘⟨ wk[ 𝒫 ]-pres-≋ (wit⊆ (R-join _ _)) (wk[ 𝒫 ]-pres-trans _ _ _) ⟩
@@ -63,7 +63,7 @@ module InclusiveTransitive (TDF : TransitiveDFrame) (ITDF : InclusiveTransitiveD
     unfolding ◇-map_
     
     -- c.f. https://en.wikipedia.org/wiki/Strong_monad#/media/File:Strong_monad_multiplication.svg
-    ◇-strong-join : join[ 𝒫 ×' 𝒬 ] ∘ (◇-map strength[ 𝒫 , 𝒬 ]) ∘ strength[ 𝒫 , ◇ 𝒬 ] ≈̇ strength[ 𝒫 , 𝒬 ] ∘ (id'[ 𝒫 ] ×'-map join[ 𝒬 ])
+    ◇-strong-join : join[ 𝒫 ×' 𝒬 ] ∘' (◇-map strength[ 𝒫 , 𝒬 ]) ∘' strength[ 𝒫 , ◇ 𝒬 ] ≈̇ strength[ 𝒫 , 𝒬 ] ∘' (id'[ 𝒫 ] ×'-map join[ 𝒬 ])
     ◇-strong-join {𝒫} {𝒬} = proof-≈̇ (λ x → proof (
       (≡-refl
       , ≡-refl

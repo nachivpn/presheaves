@@ -40,7 +40,7 @@ module StrongPointed (PDF : PointedDFrame) (IPDF : InclusivePointedDFrame IDF PD
   opaque
     unfolding ◇-map_
 
-    ◇-strong-point : strength[ 𝒫 , 𝒬 ] ∘ id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]
+    ◇-strong-point : strength[ 𝒫 , 𝒬 ] ∘' id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]
     ◇-strong-point {𝒫} {𝒬} = proof-≈̇ (λ _ → proof (≡-refl , ≡-refl
       , proof (wk[ 𝒫 ]-pres-≡-≋ R-to-⊆-pres-R-point ≋[ 𝒫 ]-refl , ≋[ 𝒬 ]-refl)))
 
@@ -52,7 +52,7 @@ module InclusiveReflexive (RDF : ReflexiveDFrame) (IRDF : InclusiveReflexiveDFra
   open Reflexive RDF
 
   opaque
-    ◇-strong-point : strength[ 𝒫 , 𝒬 ] ∘ id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]
+    ◇-strong-point : strength[ 𝒫 , 𝒬 ] ∘' id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]
     ◇-strong-point {𝒫} {𝒬} = proof-≈̇ (λ p×◇q → let p = π₁' .apply p×◇q in proof
       (≡-refl
       , ≡-refl

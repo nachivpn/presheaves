@@ -61,26 +61,26 @@ module Pointed (PDF : PointedDFrame) where
   opaque
     unfolding ◼-map_
 
-    copoint-natural : (t : 𝒫 →̇ 𝒬) → copoint[ 𝒬 ] ∘ (◼-map t) ≈̇ t ∘ copoint[ 𝒫 ]
+    copoint-natural : (t : 𝒫 →̇ 𝒬) → copoint[ 𝒬 ] ∘' (◼-map t) ≈̇ t ∘' copoint[ 𝒫 ]
     copoint-natural {𝒬 = 𝒬} t = proof-≈̇ (λ _bp → ≋[ 𝒬 ]-refl)
 
   point[_] : ∀ 𝒫 → 𝒫 →̇ ◇ 𝒫
-  point[ 𝒫 ] = copoint[ ◇ 𝒫 ] ∘ η[ 𝒫 ]
+  point[ 𝒫 ] = copoint[ ◇ 𝒫 ] ∘' η[ 𝒫 ]
 
   opaque
-    point-natural : (t : 𝒫 →̇ 𝒬) → point[ 𝒬 ] ∘ t ≈̇ ◇-map t ∘ point[ 𝒫 ]
+    point-natural : (t : 𝒫 →̇ 𝒬) → point[ 𝒬 ] ∘' t ≈̇ ◇-map t ∘' point[ 𝒫 ]
     point-natural {𝒫} {𝒬} t = let open EqReasoning (→̇-setoid 𝒫 (◇ 𝒬)) in begin
-      (copoint ∘ η) ∘ t
-        ≈⟨ ∘-assoc copoint η t ⟩
-      copoint ∘ (η ∘ t)
-        ≈⟨ ∘-pres-≈̇-right copoint (η-natural t) ⟩
-      copoint ∘ (◼-map (◇-map t) ∘ η)
-        ≈˘⟨ ∘-assoc copoint (◼-map (◇-map t)) η ⟩
-      (copoint ∘ ◼-map (◇-map t)) ∘ η
-        ≈⟨ ∘-pres-≈̇-left (copoint-natural (◇-map t)) η ⟩
-      (◇-map t ∘ copoint) ∘ η
-        ≈⟨ ∘-assoc (◇-map t) copoint η ⟩
-      ◇-map t ∘ (copoint ∘ η)
+      (copoint ∘' η) ∘' t
+        ≈⟨ ∘'-assoc copoint η t ⟩
+      copoint ∘' (η ∘' t)
+        ≈⟨ ∘'-pres-≈̇-right copoint (η-natural t) ⟩
+      copoint ∘' (◼-map (◇-map t) ∘' η)
+        ≈˘⟨ ∘'-assoc copoint (◼-map (◇-map t)) η ⟩
+      (copoint ∘' ◼-map (◇-map t)) ∘' η
+        ≈⟨ ∘'-pres-≈̇-left (copoint-natural (◇-map t)) η ⟩
+      (◇-map t ∘' copoint) ∘' η
+        ≈⟨ ∘'-assoc (◇-map t) copoint η ⟩
+      ◇-map t ∘' (copoint ∘' η)
         ∎
 
   point = λ {𝒫} → point[ 𝒫 ]
@@ -114,7 +114,7 @@ module Reflexive (RDF  : ReflexiveDFrame) where
     unfolding ◇-map_
 
     -- point is a natural transformation from the identity functor to ◇
-    point-natural : (t : 𝒫 →̇ 𝒬) → point[ 𝒬 ] ∘ t ≈̇ ◇-map t ∘ point[ 𝒫 ]
+    point-natural : (t : 𝒫 →̇ 𝒬) → point[ 𝒬 ] ∘' t ≈̇ ◇-map t ∘' point[ 𝒫 ]
     point-natural {𝒫} {𝒬} t = proof-≈̇ (λ _p → ≋[ ◇ 𝒬 ]-refl)
 
     -- obs: point need not be well-pointed

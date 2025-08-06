@@ -39,14 +39,11 @@ private
     w w' w'' u u' v v' : W
     𝒫 𝒫' 𝒬 𝒬' ℛ ℛ' ℛ'' : Psh
 
--- not used, experimental
-module CFamEquiv where
+ForAllW[_]≋ : (𝒫 : Psh) (k : K w) → ForAllW k (𝒫 ₀_) → ForAllW k (𝒫 ₀_) → Set
+ForAllW[ 𝒫 ]≋ k f g = ForAll∈ k λ p → f p ≋[ 𝒫 ] g p
 
-  ForAllW[_]≋ : (𝒫 : Psh) (k : K w) → ForAllW k (𝒫 ₀_) → ForAllW k (𝒫 ₀_) → Set
-  ForAllW[ 𝒫 ]≋ k f g = ForAll∈ k λ p → f p ≋[ 𝒫 ] g p
-
-  ForAllW[_]≋' : (𝒫 : Psh) (k k' : K w) → k ≡ k' → ForAllW k (𝒫 ₀_) → ForAllW k' (𝒫 ₀_) → Set
-  ForAllW[ 𝒫 ]≋' k k' p f g rewrite p = ForAllW[ 𝒫 ]≋ k' f g
+ForAllW[_]≋' : (𝒫 : Psh) (k k' : K w) → k ≡ k' → ForAllW k (𝒫 ₀_) → ForAllW k' (𝒫 ₀_) → Set
+ForAllW[ 𝒫 ]≋' k k' p f g rewrite p = ForAllW[ 𝒫 ]≋ k' f g
 
 record 𝒞-Fam (𝒫 : Psh) (w : W) : Set where
   constructor elem

@@ -8,10 +8,9 @@ module Presheaf.Functor.Cover.Strong.Base
   {_⊆_  : (w w' : W) → Set}
   (IF   : IFrame W _⊆_)
   (let open CF IF)
-  (𝒦   : KPsh)
-  (let open KPsh 𝒦)
+  (K   : W → Set)
   (_∈_ : (v : W) {w : W} → K w → Set)
-  (let open Core 𝒦 _∈_)
+  (let open Core K _∈_)
   (CF  : CFrame)
   (Cov : Coverage CF)
   where
@@ -56,16 +55,19 @@ strength[ 𝒫 , 𝒬 ] = record
 
     strength-fun-natural : (i : w ⊆ w') (p : 𝒫 ₀ w) (q : 𝒞-Fam 𝒬 w)
       →  wk[ 𝒞 (𝒫 ×' 𝒬) ] i (strength-fun p q) ≋[ 𝒞 (𝒫 ×' 𝒬) ] strength-fun (wk[ 𝒫 ] i p) (wk[ 𝒞 𝒬 ] i q)
-    strength-fun-natural w p (elem k f) = proof ≡-refl (λ x → proof (
-      (let open EqReasoning ≋[ 𝒫 ]-setoid in begin
-      wk[ 𝒫 ] (factor⊆ w k x) (wk[ 𝒫 ] (family k (factor∈ w k x)) p)
-        ≈˘⟨ wk[ 𝒫 ]-pres-trans _ _ p ⟩
-      wk[ 𝒫 ] (⊆-trans (family k (factor∈ w k x)) (factor⊆ w k x)) p
-        ≡⟨ ≡-cong (λ w → wk[ 𝒫 ] w p) (family-stable w k x) ⟩
-      wk[ 𝒫 ] (⊆-trans w (family (wkK w k) x)) p
-        ≈⟨ wk[ 𝒫 ]-pres-trans _ _ p ⟩
-      (wk[ 𝒫 ] (family (wkK w k) x) (wk[ 𝒫 ] w p)) ∎ ) ,
-      ≋[ 𝒬 ]-refl))
+    strength-fun-natural i p (elem k f) = proof ≡-refl (λ x → proof
+      ((let (k' , is')    = factor i k
+            (_ , x' , i') = is' x
+            open EqReasoning ≋[ 𝒫 ]-setoid in begin
+          wk[ 𝒫 ] i' (wk[ 𝒫 ] (family k x') p)
+            ≈˘⟨ wk[ 𝒫 ]-pres-trans (family k x') i' p ⟩
+          wk[ 𝒫 ] (⊆-trans (family k x') i') p
+            ≡⟨ ≡-cong (λ w → wk[ 𝒫 ] w p) (family-stable i k x) ⟩
+          wk[ 𝒫 ] (⊆-trans i (family k' x)) p
+            ≈⟨ wk[ 𝒫 ]-pres-trans i (family k' x) p ⟩
+          wk[ 𝒫 ] (family k' x) (wk[ 𝒫 ] i p)
+        ∎)
+      , ≋[ 𝒬 ]-refl))
 
 
 opaque

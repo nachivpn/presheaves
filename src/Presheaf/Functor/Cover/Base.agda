@@ -26,12 +26,14 @@ open import Presheaf.CartesianClosure IF
 open import PUtil
 
 open import Relation.Binary.PropositionalEquality
-  using (_≡_; cong; cong₂)
-  renaming (refl to ≡-refl; sym to ≡-sym; trans to ≡-trans ; subst to ≡-subst)
+  using (_≡_)
+  renaming (refl to ≡-refl; sym to ≡-sym; trans to ≡-trans ; subst to ≡-subst ; cong to ≡-cong)
 open import Relation.Binary.PropositionalEquality.Properties
   using () renaming (isEquivalence to ≡-equiv)
 
 open import Data.Product using (∃; Σ; _×_; _,_; -,_) renaming (proj₁ to fst; proj₂ to snd)
+
+open import PEUtil using (subst-application1′)
 
 private
   variable
@@ -72,14 +74,36 @@ syntax 𝒞-≋[]-syn 𝒫 x y = x 𝒞-≋[ 𝒫 ] y
 𝒞-≋-trans {𝒫 = 𝒫} (proof ≡-refl f) (proof ≡-refl f')
   = proof ≡-refl (λ p → ≋[ 𝒫 ]-trans (f p) (f' p))
 
-wkElems : {k : K w} {k' : K w'} → k ⊆k k' → ForAllW k (𝒫 ₀_) → ForAllW k' (𝒫 ₀_)
-wkElems {𝒫 = 𝒫} is fam x = let (_ , x' , i) = is x in wk[ 𝒫 ] i (fam x')
+wkElems[_] : (𝒫 : Psh) → {k : K w} {k' : K w'} → k ⊆k k' → ForAllW k (𝒫 ₀_) → ForAllW k' (𝒫 ₀_)
+wkElems[ 𝒫 ] is fam x = let (_ , x' , i) = is x in wk[ 𝒫 ] i (fam x')
 
-𝒞-kmap : w ⇒k w' → 𝒞-Fam 𝒫 w → 𝒞-Fam 𝒫 w' 
-𝒞-kmap {𝒫 = 𝒫} (f , p) (elem k fam) = elem (f k) (wkElems {𝒫 = 𝒫} (p k) fam)
+wkElems-pres-≋-left : {k : K w} {k' : K w'} {is is' : k ⊆k k'}
+  → is ≋[⊆k] is' → (elems : ForAllW k (𝒫 ₀_))
+  → ForAllW[ 𝒫 ]≋ k' (wkElems[ 𝒫 ] is elems) (wkElems[ 𝒫 ] is' elems)
+wkElems-pres-≋-left {𝒫 = 𝒫} is≋is' _ p rewrite is≋is' p = ≋[ 𝒫 ]-refl
 
-𝒞-kmap-pres-≋-left : {h h' : w ⇒k w'} → h ≋[⇒k] h' → (x :  𝒞-Fam 𝒫 w) → 𝒞-kmap h x 𝒞-≋[ 𝒫 ] 𝒞-kmap h' x
-𝒞-kmap-pres-≋-left {𝒫 = 𝒫} (proof dom≋ prf≋) (elem cov elems) = proof (dom≋ cov) λ p → {!!}
+wkElems-pres-≋-right : {k : K w} {k' : K w'}
+  → (is : k ⊆k k') {elems elems' : ForAllW k (𝒫 ₀_)}
+  → ForAllW[ 𝒫 ]≋ k elems elems'
+  → ForAllW[ 𝒫 ]≋ k' (wkElems[ 𝒫 ] is elems) (wkElems[ 𝒫 ] is elems')
+wkElems-pres-≋-right {𝒫 = 𝒫} is el≋el' x
+  = let (_ , x' , i) = is x in wk[ 𝒫 ]-pres-≋ i (el≋el' x')
+
+𝒞-kmap : w ⇒k w' → 𝒞-Fam 𝒫 w → 𝒞-Fam 𝒫 w'
+𝒞-kmap {𝒫 = 𝒫} h (elem k fam) = elem (h $k k) (wkElems[ 𝒫 ] (h $⊆ k) fam)
+
+𝒞-kmap-pres-≋-left : {h h' : w ⇒k w'} → h ≋[⇒k] h' → (x : 𝒞-Fam 𝒫 w) → 𝒞-kmap h x 𝒞-≋[ 𝒫 ] 𝒞-kmap h' x
+𝒞-kmap-pres-≋-left {𝒫 = 𝒫} {h = h} {h'} (proof h≋h') (elem k elems)
+  = let (k1≡k2 , is1≋is2) = h≋h' k in
+    proof k1≡k2 λ p → let open EqReasoning ≋[ 𝒫 ]-setoid in
+      begin
+        (≡-subst (AllForW (_₀_ 𝒫)) k1≡k2 (wkElems[ 𝒫 ] (h $⊆ k) elems)) p
+          ≡⟨ ≡-cong (λ z → z p)
+                    (subst-application1′ {P = k ⊆k_} {Q = AllForW (_₀_ 𝒫)}  wkElems[ 𝒫 ] {z = elems} k1≡k2) ⟩
+        (wkElems[ 𝒫 ] (≡-subst (k ⊆k_) k1≡k2 (h $⊆ k)) elems) p
+          ≈⟨ wkElems-pres-≋-left {𝒫 = 𝒫} is1≋is2 elems p ⟩
+        wkElems[ 𝒫 ] (h' $⊆ k) elems p
+      ∎
 
 𝒞-kmap-pres-≋-right : (h : w ⇒k w') {x x' :  𝒞-Fam 𝒫 w} → x 𝒞-≋[ 𝒫 ] x' → 𝒞-kmap h x 𝒞-≋[ 𝒫 ] 𝒞-kmap h x'
 𝒞-kmap-pres-≋-right {𝒫 = 𝒫} h (proof ≡-refl elems≋)= proof ≡-refl λ p → wk[ 𝒫 ]-pres-≋ _ (elems≋ _)

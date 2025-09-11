@@ -11,10 +11,9 @@ module Presheaf.Functor.Cover.Pointed
   {_⊆_  : (w w' : W) → Set}
   (IF   : IFrame W _⊆_)
   (let open CF IF)
-  (𝒦   : KPsh)
-  (let open KPsh 𝒦)
+  (K   : W → Set)
   (_∈_ : (v : W) {w : W} → K w → Set)
-  (let open Core 𝒦 _∈_)
+  (let open Core K _∈_)
   (CF  : CFrame)
   (PCF : Pointed CF)
   where
@@ -38,6 +37,8 @@ open import Data.Product
   using (∃; Σ; _×_; _,_; -,_)
   renaming (proj₁ to fst; proj₂ to snd)
 
+open import PEUtil using (subst-application1′)
+
 private
   variable
     w w' w'' u u' v v' : W
@@ -53,20 +54,34 @@ point[ 𝒫 ] = record
   where
 
   point-fam : 𝒫 ₀ w → ForAllW pointK[ w ] (𝒫 ₀_)
-  point-fam x p = ≡-subst (𝒫 ₀_) (point∈ p) x
+  point-fam x p = ≡-subst (𝒫 ₀_) (pointK-single p) x
 
   point-fun : 𝒫 ₀ w → 𝒞-Fam 𝒫 w
   point-fun {w} x = elem pointK[ w ] (point-fam x)
 
   opaque
     point-fun-fam-pres-≋ : {x y : 𝒫 ₀ w} → x ≋[ 𝒫 ] y → ForAllW[ 𝒫 ]≋ pointK[ _ ] (point-fam x) (point-fam y)
-    point-fun-fam-pres-≋ {w} x≋y p rewrite point∈ p = x≋y
+    point-fun-fam-pres-≋ {w} x≋y p rewrite pointK-single p = x≋y
 
     point-fun-pres-≋ : {x y : 𝒫 ₀ w} → x ≋[ 𝒫 ] y → point-fun x 𝒞-≋ point-fun y
     point-fun-pres-≋ {x = x} {y} x≋y = proof ≡-refl (point-fun-fam-pres-≋ x≋y)
 
-    point-fun-natural : (i : w ⊆ w') (p : 𝒫 ₀ w)
-      → wk[ 𝒞 𝒫 ] i (point-fun p) ≋[ 𝒞 𝒫 ] point-fun (wk[ 𝒫 ] i p)
-    point-fun-natural i x = {!!}
+    point-fam-natural : (i : w ⊆ w') (x : 𝒫 ₀ w)
+      → ForAllW[ 𝒫 ]≋ pointK[ w' ] (wkElems[ 𝒫 ] (pointK-pres-⊆ i) (point-fam x) ) (point-fam (wk[ 𝒫 ] i x))
+    point-fam-natural {w = w} {w'} i x p rewrite pointK-single p | pointK-uip[ w ] = ≋[ 𝒫 ]-refl
+
+    point-fun-natural : (i : w ⊆ w') (x : 𝒫 ₀ w) → wk[ 𝒞 𝒫 ] i (point-fun x) ≋[ 𝒞 𝒫 ] point-fun (wk[ 𝒫 ] i x)
+    point-fun-natural i x
+      = let (k≡k' , is≋is') = factor-pres-point i in proof k≡k' λ p → let open EqReasoning ≋[ 𝒫 ]-setoid in
+        begin
+          ≡-subst (AllForW (𝒫 ₀_)) k≡k' (wkElems[ 𝒫 ] (factor i $⊆ pointK[ _ ]) (point-fam x)) p
+            ≡⟨ ≡-cong (λ z → z p)
+                 (subst-application1′ {P = _ ⊆k_} {Q = AllForW (_₀_ 𝒫)}  wkElems[ 𝒫 ] {z = point-fam x} k≡k') ⟩
+          (wkElems[ 𝒫 ] (≡-subst (_ ⊆k_) k≡k' (factor i $⊆ _ )) (point-fam x)) p
+            ≈⟨ wkElems-pres-≋-left {𝒫  = 𝒫} is≋is' (point-fam x) p ⟩
+          wkElems[ 𝒫 ] (pointK-pres-⊆ i) (point-fam x) p
+            ≈⟨ point-fam-natural i x p ⟩
+          point-fam (wk[ 𝒫 ] i x) p
+            ∎
 
 point = λ {𝒫} → point[ 𝒫 ]

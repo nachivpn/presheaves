@@ -89,10 +89,10 @@ wkElems-pres-≋-right : {k : K w} {k' : K w'}
 wkElems-pres-≋-right {𝒫 = 𝒫} is el≋el' x
   = let (_ , x' , i) = is x in wk[ 𝒫 ]-pres-≋ i (el≋el' x')
 
-𝒞-kmap : w ⇒＠ w' → 𝒞-Fam 𝒫 w → 𝒞-Fam 𝒫 w'
+𝒞-kmap : w ⇒k w' → 𝒞-Fam 𝒫 w → 𝒞-Fam 𝒫 w'
 𝒞-kmap {𝒫 = 𝒫} h (elem k fam) = elem (h $k k) (wkElems[ 𝒫 ] (h $⊆ k) fam)
 
-𝒞-kmap-pres-≋-left : {h h' : w ⇒＠ w'} → h ≋[⇒＠] h' → (x : 𝒞-Fam 𝒫 w) → 𝒞-kmap h x 𝒞-≋[ 𝒫 ] 𝒞-kmap h' x
+𝒞-kmap-pres-≋-left : {h h' : w ⇒k w'} → h ≋[⇒k] h' → (x : 𝒞-Fam 𝒫 w) → 𝒞-kmap h x 𝒞-≋[ 𝒫 ] 𝒞-kmap h' x
 𝒞-kmap-pres-≋-left {𝒫 = 𝒫} {h = h} {h'} h≋h' (elem k elems)
   = let (k1≡k2 , is1≋is2) = h≋h' k in
     proof k1≡k2 λ p → let open EqReasoning ≋[ 𝒫 ]-setoid in
@@ -105,13 +105,13 @@ wkElems-pres-≋-right {𝒫 = 𝒫} is el≋el' x
         wkElems[ 𝒫 ] (h' $⊆ k) elems p
       ∎
 
-𝒞-kmap-pres-≋-right : (h : w ⇒＠ w') {x x' :  𝒞-Fam 𝒫 w} → x 𝒞-≋[ 𝒫 ] x' → 𝒞-kmap h x 𝒞-≋[ 𝒫 ] 𝒞-kmap h x'
+𝒞-kmap-pres-≋-right : (h : w ⇒k w') {x x' :  𝒞-Fam 𝒫 w} → x 𝒞-≋[ 𝒫 ] x' → 𝒞-kmap h x 𝒞-≋[ 𝒫 ] 𝒞-kmap h x'
 𝒞-kmap-pres-≋-right {𝒫 = 𝒫} h (proof ≡-refl elems≋)= proof ≡-refl λ p → wk[ 𝒫 ]-pres-≋ _ (elems≋ _)
 
-𝒞-kmap-pres-refl : (x : 𝒞-Fam 𝒫 w) → 𝒞-kmap ⇒＠-refl[ w ] x 𝒞-≋ x
+𝒞-kmap-pres-refl : (x : 𝒞-Fam 𝒫 w) → 𝒞-kmap ⇒k-refl[ w ] x 𝒞-≋ x
 𝒞-kmap-pres-refl {𝒫 = 𝒫} x = proof ≡-refl λ p → wk[ 𝒫 ]-pres-refl (x .elems p)
 
-𝒞-kmap-pres-trans : (h : w ⇒＠ w') (h' : w' ⇒＠ w'') (x : 𝒞-Fam 𝒫 w) → 𝒞-kmap (⇒＠-trans h h') x 𝒞-≋ 𝒞-kmap h' (𝒞-kmap h x)
+𝒞-kmap-pres-trans : (h : w ⇒k w') (h' : w' ⇒k w'') (x : 𝒞-Fam 𝒫 w) → 𝒞-kmap (⇒k-trans h h') x 𝒞-≋ 𝒞-kmap h' (𝒞-kmap h x)
 𝒞-kmap-pres-trans {𝒫 = 𝒫} h h' x = proof ≡-refl λ p → wk[ 𝒫 ]-pres-trans _ _ _
 
 ---------------------

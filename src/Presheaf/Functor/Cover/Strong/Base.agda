@@ -44,7 +44,7 @@ strength[ 𝒫 , 𝒬 ] = record
   where
 
   strength-fun : 𝒫 ₀ w → 𝒞-Fam 𝒬 w → 𝒞-Fam (𝒫 ×' 𝒬) w
-  strength-fun p (elem k f) = elem k λ x → elem (wk[ 𝒫 ] (family k x) p , f x)
+  strength-fun p (elem k f) = elem k λ x → elem (wk[ 𝒫 ] (cfamily k x) p , f x)
 
   opaque
     strength-fun-pres-≋ : {p p' : 𝒫 ₀ w'} {q q' : 𝒞-Fam 𝒬 w'}
@@ -59,13 +59,13 @@ strength[ 𝒫 , 𝒬 ] = record
       ((let (k' , is')    = factor i k
             (_ , x' , i') = is' x
             open EqReasoning ≋[ 𝒫 ]-setoid in begin
-          wk[ 𝒫 ] i' (wk[ 𝒫 ] (family k x') p)
-            ≈˘⟨ wk[ 𝒫 ]-pres-trans (family k x') i' p ⟩
-          wk[ 𝒫 ] (⊆-trans (family k x') i') p
+          wk[ 𝒫 ] i' (wk[ 𝒫 ] (cfamily k x') p)
+            ≈˘⟨ wk[ 𝒫 ]-pres-trans (cfamily k x') i' p ⟩
+          wk[ 𝒫 ] (⊆-trans (cfamily k x') i') p
             ≡⟨ ≡-cong (λ w → wk[ 𝒫 ] w p) (family-stable i k x) ⟩
-          wk[ 𝒫 ] (⊆-trans i (family k' x)) p
-            ≈⟨ wk[ 𝒫 ]-pres-trans i (family k' x) p ⟩
-          wk[ 𝒫 ] (family k' x) (wk[ 𝒫 ] i p)
+          wk[ 𝒫 ] (⊆-trans i (cfamily k' x)) p
+            ≈⟨ wk[ 𝒫 ]-pres-trans i (cfamily k' x) p ⟩
+          wk[ 𝒫 ] (cfamily k' x) (wk[ 𝒫 ] i p)
         ∎)
       , ≋[ 𝒬 ]-refl))
 

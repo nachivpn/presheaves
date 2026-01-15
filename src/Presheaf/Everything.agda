@@ -1,4 +1,4 @@
-{-# OPTIONS --safe --without-K #-}
+{-# OPTIONS --safe #-}
 
 module Presheaf.Everything where
 
@@ -16,8 +16,10 @@ open import Presheaf.Functor.Possibility.Strong.Base
 open import Presheaf.Functor.Possibility.Strong.Pointed
 open import Presheaf.Functor.Possibility.Strong.Joinable
 
+-- requires --with-K
 open import Presheaf.Functor.Cover.Base
 open import Presheaf.Functor.Cover.Pointed
 open import Presheaf.Functor.Cover.Strong.Base
+--open import Presheaf.Functor.Cover.Joinable
 
 open import Presheaf.Functor.Lax

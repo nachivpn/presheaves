@@ -65,9 +65,9 @@ point[ 𝒫 ] = record
     point-fun-pres-≋ {x = x} {y} x≋y = proof ≡-refl λ { ≅-refl → wk[ 𝒫 ]-pres-≋ _ x≋y }
 
     point-fam-natural : (i : w ⊆ w') (x : 𝒫 ₀ w)
-      → ForAllW[ 𝒫 ]≋ (wkElems[ 𝒫 ] (pointN-pres-≼ i) (point-fam x) ) (point-fam (wk[ 𝒫 ] i x))
+      → ForAllW[ 𝒫 ]≋ (wkElFam[ 𝒫 ] (pointN-pres-≼ i) (point-fam x) ) (point-fam (wk[ 𝒫 ] i x))
     point-fam-natural {w = w} {w'} i x {v} {p} ≅-refl = let open EqReasoning ≋[ 𝒫 ]-setoid in begin
-      wkElems[ 𝒫 ] (pointN-pres-≼ i) (point-fam x) p
+      wkElFam[ 𝒫 ] (pointN-pres-≼ i) (point-fam x) p
         ≡⟨⟩
       wk[ 𝒫 ] (⊆-trans i (pointN-family p)) (wk[ 𝒫 ] (pointN-family pointN-fwd-member[ w ]) x)
         ≈⟨ wk[ 𝒫 ]-pres-≋ _ (wk[ 𝒫 ]-pres-≡-≋ pointN-coh[ w ] ≋[ 𝒫 ]-refl) ⟩
@@ -81,9 +81,9 @@ point[ 𝒫 ] = record
     point-fun-natural : (i : w ⊆ w') (x : 𝒫 ₀ w) → wk[ 𝒞 𝒫 ] i (point-fun x) ≋[ 𝒞 𝒫 ] point-fun (wk[ 𝒫 ] i x)
     point-fun-natural i x = let (k≡k' , is≋is') = refine-coh-pointN i
       in proof k≡k' λ {v} {p} {p'} p≅p' → let open EqReasoning ≋[ 𝒫 ]-setoid in begin
-        wkElems[ 𝒫 ] (refine i $≼ _) (point-fam x) p
-          ≈⟨ wkElems-pres-≋-left {𝒫  = 𝒫} is≋is' (point-fam x) p≅p' ⟩
-        wkElems[ 𝒫 ] (pointN-pres-≼ i) (point-fam x) p'
+        wkElFam[ 𝒫 ] (refine i $≼ _) (point-fam x) p
+          ≈⟨ wkElFam-pres-≋-left {𝒫  = 𝒫} is≋is' (point-fam x) p≅p' ⟩
+        wkElFam[ 𝒫 ] (pointN-pres-≼ i) (point-fam x) p'
           ≈⟨ point-fam-natural i x ≅-refl ⟩
         point-fam (wk[ 𝒫 ] i x) p' ∎
 

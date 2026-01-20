@@ -16,7 +16,7 @@ module Presheaf.Functor.Cover.Strong.Base
   where
 
 open IFrame IF
-open CFrame CF 
+open CFrame CF
 open Coverage Cov renaming (refine-comm-cfamily to family-stable)
 
 open import Presheaf.Base IF

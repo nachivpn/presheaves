@@ -30,7 +30,7 @@ open import Relation.Binary.PropositionalEquality
   renaming (refl to ≡-refl; sym to ≡-sym; trans to ≡-trans ; subst to ≡-subst ; cong to ≡-cong)
 open import Relation.Binary.PropositionalEquality.Properties
   using () renaming (isEquivalence to ≡-equiv)
-  
+
 open import Data.Product using (∃; Σ; _×_; _,_; -,_) renaming (proj₁ to fst; proj₂ to snd)
 
 open import HEUtil
@@ -76,36 +76,36 @@ syntax 𝒞-≋[]-syn 𝒫 x y = x 𝒞-≋[ 𝒫 ] y
 𝒞-≋-trans {𝒫 = 𝒫} (proof ≡-refl f) (proof q f')
   = proof q (λ r → ≋[ 𝒫 ]-trans (f ≅-refl) (f' r))
 
-wkElems[_] : (𝒫 : Psh) → {k : K w} {k' : K w'} → k ≼ k' → ForAllW k (𝒫 ₀_) → ForAllW k' (𝒫 ₀_)
-wkElems[ 𝒫 ] is fam x = let (_ , x' , i) = is x in wk[ 𝒫 ] i (fam x')
+wkElFam[_] : (𝒫 : Psh) → {k : K w} {k' : K w'} → k ≼ k' → ForAllW k (𝒫 ₀_) → ForAllW k' (𝒫 ₀_)
+wkElFam[ 𝒫 ] is fam x = let (_ , x' , i) = is x in wk[ 𝒫 ] i (fam x')
 
-wkElems-pres-≋-left : {k : K w} {k' k'' : K w'} {is : k ≼ k'} {is' : k ≼ k''}
+wkElFam-pres-≋-left : {k : K w} {k' k'' : K w'} {is : k ≼ k'} {is' : k ≼ k''}
   → is ≋[≼] is' → (elems : ForAllW k (𝒫 ₀_))
-  → ForAllW[ 𝒫 ]≋ (wkElems[ 𝒫 ] is elems) (wkElems[ 𝒫 ] is' elems)
-wkElems-pres-≋-left {𝒫 = 𝒫} (≡-refl , is≋is') _ {v} {p} {.p} ≅-refl  rewrite is≋is' {v} {p} ≅-refl
+  → ForAllW[ 𝒫 ]≋ (wkElFam[ 𝒫 ] is elems) (wkElFam[ 𝒫 ] is' elems)
+wkElFam-pres-≋-left {𝒫 = 𝒫} (≡-refl , is≋is') _ {v} {p} {.p} ≅-refl  rewrite is≋is' {v} {p} ≅-refl
   = ≋[ 𝒫 ]-refl
 
-wkElems-pres-≋-right : {k : K w} {k' : K w'}
+wkElFam-pres-≋-right : {k : K w} {k' : K w'}
   → (is : k ≼ k') {elems elems' : ForAllW k (𝒫 ₀_)}
   → ForAllW[ 𝒫 ]≋ elems elems'
-  → ForAllW[ 𝒫 ]≋ (wkElems[ 𝒫 ] is elems) (wkElems[ 𝒫 ] is elems')
-wkElems-pres-≋-right {𝒫 = 𝒫} is el≋el' ≅-refl
+  → ForAllW[ 𝒫 ]≋ (wkElFam[ 𝒫 ] is elems) (wkElFam[ 𝒫 ] is elems')
+wkElFam-pres-≋-right {𝒫 = 𝒫} is el≋el' ≅-refl
   = wk[ 𝒫 ]-pres-≋ _ (el≋el' ≅-refl)
 
-wkElems-pres-≋ : {k : K w} {k' : K w'} {is is' : k ≼ k'} {elems elems' : ForAllW k (𝒫 ₀_)}
+wkElFam-pres-≋ : {k : K w} {k' : K w'} {is is' : k ≼ k'} {elems elems' : ForAllW k (𝒫 ₀_)}
   → is ≋[≼] is'
   → ForAllW[ 𝒫 ]≋ elems elems'
-  → ForAllW[ 𝒫 ]≋ (wkElems[ 𝒫 ] is elems) (wkElems[ 𝒫 ] is' elems')
-wkElems-pres-≋ {𝒫 = 𝒫} (≡-refl , ref≋) el≋el' {v} {p} {.p} ≅-refl
+  → ForAllW[ 𝒫 ]≋ (wkElFam[ 𝒫 ] is elems) (wkElFam[ 𝒫 ] is' elems')
+wkElFam-pres-≋ {𝒫 = 𝒫} (≡-refl , ref≋) el≋el' {v} {p} {.p} ≅-refl
   rewrite ref≋ {v} {p} ≅-refl = wk[ 𝒫 ]-pres-≋ _ (el≋el' ≅-refl)
 
 𝒞-kmap : w ⇒≼ w' → 𝒞-Fam 𝒫 w → 𝒞-Fam 𝒫 w'
-𝒞-kmap {𝒫 = 𝒫} h (elem k fam) = elem (h $α k) (wkElems[ 𝒫 ] (h $≼ k) fam)
+𝒞-kmap {𝒫 = 𝒫} h (elem k fam) = elem (h $α k) (wkElFam[ 𝒫 ] (h $≼ k) fam)
 
 𝒞-kmap-pres-≋-left : {h h' : w ⇒≼ w'} → h ≋[⇒≼] h' → (x : 𝒞-Fam 𝒫 w) → 𝒞-kmap h x 𝒞-≋[ 𝒫 ] 𝒞-kmap h' x
 𝒞-kmap-pres-≋-left {𝒫 = 𝒫} {h = h} {h'} h≋h' (elem k elems)
-  = let (k1≡k2 , is1≋is2) = h≋h' k in proof k1≡k2 (wkElems-pres-≋-left {𝒫 = 𝒫} is1≋is2 elems)
-  
+  = let (k1≡k2 , is1≋is2) = h≋h' k in proof k1≡k2 (wkElFam-pres-≋-left {𝒫 = 𝒫} is1≋is2 elems)
+
 𝒞-kmap-pres-≋-right : (h : w ⇒≼ w') {x x' :  𝒞-Fam 𝒫 w} → x 𝒞-≋[ 𝒫 ] x' → 𝒞-kmap h x 𝒞-≋[ 𝒫 ] 𝒞-kmap h x'
 𝒞-kmap-pres-≋-right {𝒫 = 𝒫} h (proof ≡-refl elems≋)= proof ≡-refl λ { ≅-refl → wk[ 𝒫 ]-pres-≋ _ (elems≋ ≅-refl) }
 

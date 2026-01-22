@@ -65,7 +65,7 @@ point[ 𝒫 ] = record
     point-fun-pres-≋ {x = x} {y} x≋y = proof ≡-refl λ { ≅-refl → wk[ 𝒫 ]-pres-≋ _ x≋y }
 
     point-fam-natural : (i : w ⊆ w') (x : 𝒫 ₀ w)
-      → ForAllW[ 𝒫 ]≋ (wkElFam[ 𝒫 ] (pointN-pres-≼ i) (point-fam x) ) (point-fam (wk[ 𝒫 ] i x))
+      → ElFam[ 𝒫 ]≋ (wkElFam[ 𝒫 ] (pointN-pres-≼ i) (point-fam x) ) (point-fam (wk[ 𝒫 ] i x))
     point-fam-natural {w = w} {w'} i x {v} {p} ≅-refl = let open EqReasoning ≋[ 𝒫 ]-setoid in begin
       wkElFam[ 𝒫 ] (pointN-pres-≼ i) (point-fam x) p
         ≡⟨⟩

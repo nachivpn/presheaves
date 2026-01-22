@@ -10,7 +10,7 @@ module Presheaf.Functor.Cover.Joinable
   (let open CF IF)
   (K   : W → Set)
   (_∈_ : (v : W) {w : W} → K w → Set)
-  (let open Core K _∈_)
+  (let open Core K _∈_ renaming (NFam to KFam))
   (CF  : CFrame)
   (JCF : Joinable CF)
   where
@@ -43,35 +43,82 @@ private
     w w' w'' u u' v v' : W
     𝒫 𝒫' 𝒬 𝒬' ℛ ℛ' ℛ'' : Psh
 
--- "element tree"
-ElTree[_] : (𝒫 : Psh) {α : K w} → (α[_] : ForAllW α K) → Set
-ElTree[ 𝒫 ] {α = α} α[_] = ForAll∈ α (AllForW (𝒫 ₀_) ∘ α[_])
+module _ (𝒫 : Psh) where
 
--- extensional equivalence for element trees
-ElTree[_]≋ : (𝒫 : Psh) {α : K w} {α[_] : ForAllW α K} {α[_]' : ForAllW α K}
-  → (f : ElTree[ 𝒫 ] α[_]) (f' : ElTree[ 𝒫 ] α[_]') → Set
-ElTree[ 𝒫 ]≋ {α = α} f f' = {u u' : W} {p : u ∈ α} {p' : u' ∈ α}
-  → u ≡ u' → p ≅ p' → ForAllW[ 𝒫 ]≋ (f {u} p) (f' {u'} p')
+  -- "element tree"
+  ElTree[_] : {α : K w} → (α[_] : KFam α) → Set
+  ElTree[_] = Tree[ 𝒫 ₀_ ]
 
--- congruence for element trees
-≋[_]-cong-ElTree : (𝒫 : Psh) {α : K w} {α[_] : ForAllW α K}
-  → (f : ElTree[ 𝒫 ] α[_])
-  → {u u' : W} (u≡u' : u ≡ u')
-  → {p : u ∈ α} {p' : u' ∈ α} (p≅p' : p ≅ p')
-  → {v : W} {q : v ∈ α[ p ]} {q' : v ∈ α[ p' ]} (q≅q' : q ≅ q')
-  → f {u} p q ≋[ 𝒫 ] f {u'} p' q'
-≋[ 𝒫 ]-cong-ElTree f ≡-refl ≅-refl ≅-refl = ≋[ 𝒫 ]-refl
 
--- weakening/refining element trees
-wkElTree[_] : (𝒫 : Psh) {α : K w} {α[_] : ForAllW α K} {α' : K w'}
-  → (is : α ≼ α')
-  → ElTree[ 𝒫 ]  α[_]
-  → ElTree[ 𝒫 ] (wkNFam is α[_])
-wkElTree[ 𝒫 ] {α} {α[_]} α≼α' tr {u'} u'∈α' {v'} v'∈α[u'] = let
+  -- extensional equivalence for element trees
+  ElTree[_]≋ : {α : K w} {α[_] α[_]' : KFam α}
+    → (f : ElTree[_] α[_]) (f' : ElTree[_] α[_]') → Set
+  ElTree[_]≋ {α = α} f f' = {u u' : W} {p : u ∈ α} {p' : u' ∈ α}
+    → u ≡ u' → p ≅ p' → ElFam[ 𝒫 ]≋ (f {u} p) (f' {u'} p')
+
+  -- congruence for element trees
+  ≋[_]-cong-ElTree : {α : K w} {α[_] : KFam α}
+    → (f : ElTree[_] α[_])
+    → {u u' : W} (u≡u' : u ≡ u')
+    → {p : u ∈ α} {p' : u' ∈ α} (p≅p' : p ≅ p')
+    → {v : W} {q : v ∈ α[ p ]} {q' : v ∈ α[ p' ]} (q≅q' : q ≅ q')
+    → f {u} p q ≋[ 𝒫 ] f {u'} p' q'
+  ≋[_]-cong-ElTree f ≡-refl ≅-refl ≅-refl = ≋[ 𝒫 ]-refl
+
+  -- congruence for a special case of GTrees (TODO: generalize)
+  ≋[_]-cong-GTree : {α : K w} {α[_] : KFam α} {α[_][_] : Tree[ K ] α[_]}
+    → (f : GTree[ KFam ∘ α[_] , ElTree[_] ] α[_][_])
+    → {x x' : W} (x≡x' : x ≡ x')
+    → {p : x ∈ α} {p' : x' ∈ α} (p≅p' : p ≅ p')
+    → {y y' : W} (y≡y' : y ≡ y')
+    → {q : y ∈ α[ p ]} {q' : y' ∈ α[ p' ]} (q≅q' : q ≅ q')
+    → {z : W} {r : z ∈ α[ p ][ q ]} {r' : z ∈ α[ p' ][ q' ]} (r≅r' : r ≅ r')
+    → f {x} p {y} q r ≋[ 𝒫 ] f {x'} p' {y'} q' r'
+  ≋[_]-cong-GTree f ≡-refl ≅-refl ≡-refl ≅-refl ≅-refl = ≋[ 𝒫 ]-refl
+
+  -- weakening/refining element trees
+  wkElTree[_] : {α : K w} {α[_] : KFam α} {α' : K w'}
+    → (is : α ≼ α')
+    → ElTree[_]  α[_]
+    → ElTree[_] (wkNFam is α[_])
+  wkElTree[_] {α = α} {α[_]} α≼α' tr {u'} u'∈α' {v'} v'∈α[u'] = let
       (u , u∈α , u⊆u') = α≼α' u'∈α'
       (α'[p] , α[u]≼α'[u']) = refine u⊆u' α[ u∈α ]
       (v , v∈α[u] , v⊆v') = α[u]≼α'[u'] v'∈α[u']
       in wk[ 𝒫 ] v⊆v' (tr u∈α v∈α[u])
+
+joinElFam[_] : (𝒫 : Psh) → {α : K w} (α[_] : KFam α) → ElTree[ 𝒫 ] α[_] → ElFam[ 𝒫 ] (⨆ α[_])
+joinElFam[ 𝒫 ] = joinFam[ 𝒫 ₀_ ]
+
+joinElFam[_]-assoc : (𝒫 : Psh) {α : K w} {α[_] : KFam α} {α[_][_] : Tree[ K ] α[_]}
+  → (tr : ForAll∈ α (ElTree[ 𝒫 ] ∘ α[_][_]))
+  → ElFam[ 𝒫 ]≋
+      (joinElFam[ 𝒫 ] (joinNFamᵢ α[_] α[_][_])
+        (λ x∈α → uncurry∈ (λ y∈α[x] → tr x∈α y∈α[x]) ∘ ⨆-bwd-member α[ x∈α ][_]))
+      (joinElFam[ 𝒫 ] (joinNFamₑ α[_] α[_][_])
+        (uncurry∈ (λ x∈α → tr x∈α) ∘ ⨆-bwd-member α[_]))
+joinElFam[ 𝒫 ]-assoc {α} {α[_]} {α[_][_]} tr {z} {z∈ji} {z∈je} r≅r' = let
+  -- LHS
+  (x , x∈α , z∈⨆α[x][-]) = ⨆-bwd-member (joinNFamᵢ α[_] α[_][_]) z∈ji
+  (y , y∈α[x] , z∈α[x][y]) = ⨆-bwd-member α[ x∈α ][_] z∈⨆α[x][-]
+  -- RHS
+  (y' , y'∈⨆α[-] , z∈α[x'][y']) = ⨆-bwd-member (joinNFamₑ α[_] α[_][_]) z∈je
+  (x' , x'∈α , y'∈α[x']) = ⨆-bwd-member α[_] y'∈⨆α[-]
+  (x≡x' , x∈α≅x'∈α , y≡y' , y∈α[x]≅y'∈α[x'] , z∈α[x][y]≅z∈α[x'][y']) = ⨆-bwd-member-resp-assoc r≅r'
+  open EqReasoning ≋[ 𝒫 ]-setoid
+  in begin
+    joinElFam[ 𝒫 ]
+      (joinNFamᵢ α[_] α[_][_])
+      (λ x∈α → uncurry∈ (λ y∈α[x] → tr x∈α y∈α[x]) ∘ ⨆-bwd-member (α[_][_] x∈α)) z∈ji
+      ≡⟨⟩
+    tr {x} x∈α {y} y∈α[x] {z} z∈α[x][y]
+      ≈⟨ ≋[ 𝒫 ]-cong-GTree tr x≡x' x∈α≅x'∈α y≡y' y∈α[x]≅y'∈α[x'] z∈α[x][y]≅z∈α[x'][y'] ⟩
+    tr {x'} x'∈α {y'} y'∈α[x'] {z} z∈α[x'][y']
+      ≡⟨⟩
+    joinElFam[ 𝒫 ]
+      (joinNFamₑ α[_] α[_][_])
+      (uncurry∈ (λ x∈α → tr x∈α) ∘ ⨆-bwd-member α[_]) z∈je
+      ∎
 
 join[_] : ∀ 𝒫 → 𝒞 𝒞 𝒫 →̇ 𝒞 𝒫
 join[ 𝒫 ] = record
@@ -81,40 +128,28 @@ join[ 𝒫 ] = record
   }
   where
 
-  join-fam : {α : K w} (α[_] : ForAllW α K)
-      → ElTree[ 𝒫 ] α[_]
-      → ForAllW (⨆ α[_]) (𝒫 ₀_)
-  join-fam {α = α} α[_] tr {v} v∈⨆α[-] = let
-    (u , u∈α , v∈α[u]) = ⨆-bwd-member α[_] v∈⨆α[-]
-    in tr {u} u∈α v∈α[u]
-
-  join-fun : 𝒞-Fam (𝒞 𝒫) w → 𝒞-Fam 𝒫 w
-  join-fun (elem α fam) = elem (⨆ (cov ∘ fam)) (join-fam (cov ∘ fam) (elems ∘ fam))
+  joinElFam : {α : K w} (α[_] : KFam α) → ElTree[ 𝒫 ] α[_] → ElFam[ 𝒫 ] (⨆ α[_])
+  joinElFam = joinElFam[ 𝒫 ]
 
   opaque
 
-    join-fam-pres-≋ : {α : K w} {α[_] : ForAllW α K} {α[_]' : ForAllW α K}
+
+
+    joinElFam-pres-≋ : {α : K w} {α[_] α[_]' : KFam α}
       → {tr  : ElTree[ 𝒫 ] α[_]} {tr' : ElTree[ 𝒫 ] α[_]'}
       → ForAllW≅ α[_] α[_]' → ElTree[ 𝒫 ]≋ tr tr'
-      → ForAllW[ 𝒫 ]≋ (join-fam α[_] tr) (join-fam α[_]' tr')
-    join-fam-pres-≋  α[-]≋α'[-] tr≋tr' r≅r' =
+      → ElFam[ 𝒫 ]≋ (joinElFam α[_] tr) (joinElFam α[_]' tr')
+    joinElFam-pres-≋  α[-]≋α'[-] tr≋tr' r≅r' =
       let (u≡u' , p≅p' , q≅q') = ⨆-bwd-member-pres-≋ α[-]≋α'[-] r≅r'
       in tr≋tr' u≡u' p≅p' q≅q'
 
-    join-fun-pres-≋ : {cx cx' : 𝒞-Fam (𝒞 𝒫) w}
-      → cx 𝒞-≋[ 𝒞 𝒫 ] cx' → join-fun cx 𝒞-≋[ 𝒫 ] join-fun cx'
-    join-fun-pres-≋ {cx = elem α fam} {cx' = elem α' fam'} (proof ≡-refl fam≋fam')
-      = proof
-          (⨆-pres-≋ (≡-refl , cov≋ ∘ fam≋fam'))
-          (join-fam-pres-≋ (≡-refl , cov≋ ∘ fam≋fam') (λ { ≡-refl → elems≋ ∘ fam≋fam'}))
-
-    join-fam-natural : {α : K w} {α' : K w'}
-      → {α[_] : ForAllW α K} {tr : ElTree[ 𝒫 ] α[_]}
+    joinElFam-natural : {α : K w} {α' : K w'}
+      → {α[_] : KFam α} {tr : ElTree[ 𝒫 ] α[_]}
       → (α≼α' : α ≼ α')
-      → ForAllW[ 𝒫 ]≋
-          (wkElFam[ 𝒫 ] (⨆-pres-≼ α≼α' α[_]) (join-fam α[_] tr))
-          (join-fam (wkNFam α≼α' α[_]) (wkElTree[ 𝒫 ] α≼α' tr))
-    join-fam-natural {α = α} {α'} {α[_] = α[_]} {tr} α≼α' {v'} {v'∈⨆α'[-]} ≅-refl = let
+      → ElFam[ 𝒫 ]≋
+          (wkElFam[ 𝒫 ] (⨆-pres-≼ α≼α' α[_]) (joinElFam α[_] tr))
+          (joinElFam (wkNFam α≼α' α[_]) (wkElTree[ 𝒫 ] α≼α' tr))
+    joinElFam-natural {α = α} {α'} {α[_] = α[_]} {tr} α≼α' {v'} {v'∈⨆α'[-]} ≅-refl = let
       α'[_]                   = wkNFam α≼α' α[_]
       (v , v∈⨆α[-] , v⊆v')    = ⨆-pres-≼ α≼α' α[_] v'∈⨆α'[-] -- uses ⨆-fwd-member
       -- LHS stuff
@@ -128,35 +163,46 @@ join[ 𝒫 ] = record
       (zᵤ≡u , zᵤ∈α≅u∈α , v∈α[zᵤ]≅v∈α[u]) = ⨆-fwd-bwd-id (u , u∈α , v∈α[u])
       open EqReasoning ≋[ 𝒫 ]-setoid in
       begin
-        wkElFam[ 𝒫 ] (⨆-pres-≼ α≼α' α[_]) (join-fam α[_] tr) v'∈⨆α'[-]
+        wkElFam[ 𝒫 ] (⨆-pres-≼ α≼α' α[_]) (joinElFam α[_] tr) v'∈⨆α'[-]
           ≡⟨⟩ -- expand wkElFam
-        wk[ 𝒫 ] v⊆v' (join-fam α[_] tr v∈⨆α[-])
-          ≡⟨⟩ -- expand join-fam
+        wk[ 𝒫 ] v⊆v' (joinElFam α[_] tr v∈⨆α[-])
+          ≡⟨⟩ -- expand joinElFam
         wk[ 𝒫 ] v⊆v' (tr {zᵤ} zᵤ∈α v∈α[zᵤ])
           ≈⟨ wk[ 𝒫 ]-pres-≋ v⊆v' (≋[ 𝒫 ]-cong-ElTree tr zᵤ≡u zᵤ∈α≅u∈α v∈α[zᵤ]≅v∈α[u]) ⟩
         wk[ 𝒫 ] v⊆v' (tr {u} u∈α v∈α[u])
           ≡⟨⟩ -- contract wkElTree
         wkElTree[ 𝒫 ] α≼α' tr u'∈α' v'∈α'[u']
-          ≡⟨⟩ -- contract join-fam
-        join-fam α'[_] (wkElTree[ 𝒫 ] α≼α' tr) v'∈⨆α'[-]
+          ≡⟨⟩ -- contract joinElFam
+        joinElFam α'[_] (wkElTree[ 𝒫 ] α≼α' tr) v'∈⨆α'[-]
           ∎
+
+  join-fun : 𝒞-Fam (𝒞 𝒫) w → 𝒞-Fam 𝒫 w
+  join-fun (elem α fam) = elem (⨆ (cov ∘ fam)) (joinElFam (cov ∘ fam) (elems ∘ fam))
+
+  opaque
+    join-fun-pres-≋ : {cx cx' : 𝒞-Fam (𝒞 𝒫) w}
+      → cx 𝒞-≋[ 𝒞 𝒫 ] cx' → join-fun cx 𝒞-≋[ 𝒫 ] join-fun cx'
+    join-fun-pres-≋ {cx = elem α fam} {cx' = elem α' fam'} (proof ≡-refl fam≋fam')
+      = proof
+          (⨆-pres-≋ (≡-refl , cov≋ ∘ fam≋fam'))
+          (joinElFam-pres-≋ (≡-refl , cov≋ ∘ fam≋fam') (λ { ≡-refl → elems≋ ∘ fam≋fam'}))
 
     join-fun-natural : (i : w ⊆ w') (p : (𝒞 (𝒞 𝒫)) ₀ w) →
       wk[ 𝒞 𝒫 ] i (join-fun p) ≋[ 𝒞 𝒫 ] join-fun (wk[ 𝒞 (𝒞 𝒫) ] i p)
     join-fun-natural i (elem α fam) = let
-      α[_] : NFam α
+      α[_] : KFam α
       α[_] = cov ∘ fam
-      tr : {u : W} (p : u ∈ α) → ForAllW α[ p ] (𝒫 ₀_)
+      tr : {u : W} (p : u ∈ α) → ElFam[ 𝒫 ] α[ p ]
       tr = elems ∘ fam
       (rjα≡jrα , is≋is') = refine-coh-joinN i α α[_]
       in proof rjα≡jrα λ {v} {p} {p'} p≅p' →
         let open EqReasoning ≋[ 𝒫 ]-setoid
         in begin
-          wkElFam[ 𝒫 ] (refine i $≼ (⨆ α[_])) (join-fam α[_] tr) p
-            ≈⟨ wkElFam-pres-≋-left {𝒫  = 𝒫} is≋is' (join-fam α[_] tr) p≅p' ⟩
-          wkElFam[ 𝒫 ] (⨆-pres-≼ (refine i $≼ α) α[_]) (join-fam α[_] tr) p'
-            ≈⟨ join-fam-natural {tr = tr} (refine i $≼ α) ≅-refl ⟩
-          join-fam (wkNFam (refine i $≼ α) α[_]) (wkElTree[ 𝒫 ] (refine i $≼ α) tr) p'
+          wkElFam[ 𝒫 ] (refine i $≼ (⨆ α[_])) (joinElFam α[_] tr) p
+            ≈⟨ wkElFam-pres-≋-left {𝒫  = 𝒫} is≋is' (joinElFam α[_] tr) p≅p' ⟩
+          wkElFam[ 𝒫 ] (⨆-pres-≼ (refine i $≼ α) α[_]) (joinElFam α[_] tr) p'
+            ≈⟨ joinElFam-natural {tr = tr} (refine i $≼ α) ≅-refl ⟩
+          joinElFam (wkNFam (refine i $≼ α) α[_]) (wkElTree[ 𝒫 ] (refine i $≼ α) tr) p'
             ∎
 
 opaque
@@ -168,7 +214,7 @@ opaque
 
   open import Presheaf.Functor.Cover.Base as B using ()
 
-  -- join-assoc : join[ 𝒫 ] ∘' (𝒞-map join[ 𝒫 ]) ≈̇ join[ 𝒫 ] ∘' join[ 𝒞 𝒫 ]
-  -- join-assoc {𝒫} (elem α fam) = proof joinN-assoc λ x → {!!}
+  join-assoc : join[ 𝒫 ] ∘' (𝒞-map join[ 𝒫 ]) ≈̇ join[ 𝒫 ] ∘' join[ 𝒞 𝒫 ]
+  join-assoc {𝒫} (elem α fam) = proof joinN-assoc (joinElFam[ 𝒫 ]-assoc λ v∈α → elems ∘ elems (fam v∈α))
 
 join = λ {𝒫} → join[ 𝒫 ]

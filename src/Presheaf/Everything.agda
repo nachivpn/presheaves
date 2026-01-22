@@ -20,6 +20,6 @@ open import Presheaf.Functor.Possibility.Strong.Joinable
 open import Presheaf.Functor.Cover.Base
 open import Presheaf.Functor.Cover.Pointed
 open import Presheaf.Functor.Cover.Strong.Base
---open import Presheaf.Functor.Cover.Joinable
+open import Presheaf.Functor.Cover.Joinable
 
 open import Presheaf.Functor.Lax

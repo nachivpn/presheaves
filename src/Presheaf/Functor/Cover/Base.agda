@@ -40,14 +40,18 @@ private
     w w' w'' u u' v v' : W
     𝒫 𝒫' 𝒬 𝒬' ℛ ℛ' ℛ'' : Psh
 
-ForAllW[_]≋ : (𝒫 : Psh) {k : K w} {k' : K w'} → ForAllW k (𝒫 ₀_) → ForAllW k' (𝒫 ₀_) → Set
-ForAllW[ 𝒫 ]≋ {k} {k'} f g = ∀ {v} {p : v ∈ k} {p' : v ∈ k'} → p ≅ p' → f p ≋[ 𝒫 ] g p'
+-- "element family"
+ElFam[_] : (𝒫 : Psh) (α : K w) → Set
+ElFam[ 𝒫 ] α = ForAllW α (𝒫 ₀_)
+
+ElFam[_]≋ : (𝒫 : Psh) {k : K w} {k' : K w'} → ForAllW k (𝒫 ₀_) → ForAllW k' (𝒫 ₀_) → Set
+ElFam[ 𝒫 ]≋ {k} {k'} f g = ∀ {v} {p : v ∈ k} {p' : v ∈ k'} → p ≅ p' → f p ≋[ 𝒫 ] g p'
 
 record 𝒞-Fam (𝒫 : Psh) (w : W) : Set where
   constructor elem
   field
     cov   : K w
-    elems : ForAllW cov (𝒫 ₀_)
+    elems : ElFam[ 𝒫 ] cov
 
 open 𝒞-Fam public
 
@@ -55,7 +59,7 @@ record _𝒞-≋_ {𝒫 : Psh} {w : W} (x y : 𝒞-Fam 𝒫 w) : Set where
   constructor proof
   field
     cov≋   : cov x ≡ cov y
-    elems≋ : ForAllW[ 𝒫 ]≋ (elems x) (elems y)
+    elems≋ : ElFam[ 𝒫 ]≋ (elems x) (elems y)
 
 open _𝒞-≋_ public
 
@@ -81,21 +85,21 @@ wkElFam[ 𝒫 ] is fam x = let (_ , x' , i) = is x in wk[ 𝒫 ] i (fam x')
 
 wkElFam-pres-≋-left : {k : K w} {k' k'' : K w'} {is : k ≼ k'} {is' : k ≼ k''}
   → is ≋[≼] is' → (elems : ForAllW k (𝒫 ₀_))
-  → ForAllW[ 𝒫 ]≋ (wkElFam[ 𝒫 ] is elems) (wkElFam[ 𝒫 ] is' elems)
+  → ElFam[ 𝒫 ]≋ (wkElFam[ 𝒫 ] is elems) (wkElFam[ 𝒫 ] is' elems)
 wkElFam-pres-≋-left {𝒫 = 𝒫} (≡-refl , is≋is') _ {v} {p} {.p} ≅-refl  rewrite is≋is' {v} {p} ≅-refl
   = ≋[ 𝒫 ]-refl
 
 wkElFam-pres-≋-right : {k : K w} {k' : K w'}
   → (is : k ≼ k') {elems elems' : ForAllW k (𝒫 ₀_)}
-  → ForAllW[ 𝒫 ]≋ elems elems'
-  → ForAllW[ 𝒫 ]≋ (wkElFam[ 𝒫 ] is elems) (wkElFam[ 𝒫 ] is elems')
+  → ElFam[ 𝒫 ]≋ elems elems'
+  → ElFam[ 𝒫 ]≋ (wkElFam[ 𝒫 ] is elems) (wkElFam[ 𝒫 ] is elems')
 wkElFam-pres-≋-right {𝒫 = 𝒫} is el≋el' ≅-refl
   = wk[ 𝒫 ]-pres-≋ _ (el≋el' ≅-refl)
 
 wkElFam-pres-≋ : {k : K w} {k' : K w'} {is is' : k ≼ k'} {elems elems' : ForAllW k (𝒫 ₀_)}
   → is ≋[≼] is'
-  → ForAllW[ 𝒫 ]≋ elems elems'
-  → ForAllW[ 𝒫 ]≋ (wkElFam[ 𝒫 ] is elems) (wkElFam[ 𝒫 ] is' elems')
+  → ElFam[ 𝒫 ]≋ elems elems'
+  → ElFam[ 𝒫 ]≋ (wkElFam[ 𝒫 ] is elems) (wkElFam[ 𝒫 ] is' elems')
 wkElFam-pres-≋ {𝒫 = 𝒫} (≡-refl , ref≋) el≋el' {v} {p} {.p} ≅-refl
   rewrite ref≋ {v} {p} ≅-refl = wk[ 𝒫 ]-pres-≋ _ (el≋el' ≅-refl)
 

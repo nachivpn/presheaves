@@ -128,27 +128,22 @@ join[ 𝒫 ] = record
   }
   where
 
-  joinElFam : {α : K w} (α[_] : KFam α) → ElTree[ 𝒫 ] α[_] → ElFam[ 𝒫 ] (⨆ α[_])
-  joinElFam = joinElFam[ 𝒫 ]
-
   opaque
-
-
 
     joinElFam-pres-≋ : {α : K w} {α[_] α[_]' : KFam α}
       → {tr  : ElTree[ 𝒫 ] α[_]} {tr' : ElTree[ 𝒫 ] α[_]'}
       → ForAllW≅ α[_] α[_]' → ElTree[ 𝒫 ]≋ tr tr'
-      → ElFam[ 𝒫 ]≋ (joinElFam α[_] tr) (joinElFam α[_]' tr')
+      → ElFam[ 𝒫 ]≋ (joinElFam[ 𝒫 ] α[_] tr) (joinElFam[ 𝒫 ] α[_]' tr')
     joinElFam-pres-≋  α[-]≋α'[-] tr≋tr' r≅r' =
-      let (u≡u' , p≅p' , q≅q') = ⨆-bwd-member-pres-≋ α[-]≋α'[-] r≅r'
+      let (_ , u≡u' , p≅p' , q≅q') = ⨆-bwd-member-pres-≋ α[-]≋α'[-] r≅r'
       in tr≋tr' u≡u' p≅p' q≅q'
 
     joinElFam-natural : {α : K w} {α' : K w'}
       → {α[_] : KFam α} {tr : ElTree[ 𝒫 ] α[_]}
       → (α≼α' : α ≼ α')
       → ElFam[ 𝒫 ]≋
-          (wkElFam[ 𝒫 ] (⨆-pres-≼ α≼α' α[_]) (joinElFam α[_] tr))
-          (joinElFam (wkNFam α≼α' α[_]) (wkElTree[ 𝒫 ] α≼α' tr))
+          (wkElFam[ 𝒫 ] (⨆-pres-≼ α≼α' α[_]) (joinElFam[ 𝒫 ] α[_] tr))
+          (joinElFam[ 𝒫 ] (wkNFam α≼α' α[_]) (wkElTree[ 𝒫 ] α≼α' tr))
     joinElFam-natural {α = α} {α'} {α[_] = α[_]} {tr} α≼α' {v'} {v'∈⨆α'[-]} ≅-refl = let
       α'[_]                   = wkNFam α≼α' α[_]
       (v , v∈⨆α[-] , v⊆v')    = ⨆-pres-≼ α≼α' α[_] v'∈⨆α'[-] -- uses ⨆-fwd-member
@@ -160,12 +155,12 @@ join[ 𝒫 ] = record
       -- RHS stuff
       (zᵤ , zᵤ∈α , v∈α[zᵤ])  = ⨆-bwd-member α[_] v∈⨆α[-]
       -- Equivalence
-      (zᵤ≡u , zᵤ∈α≅u∈α , v∈α[zᵤ]≅v∈α[u]) = ⨆-fwd-bwd-id (u , u∈α , v∈α[u])
+      (_ , zᵤ≡u , zᵤ∈α≅u∈α , v∈α[zᵤ]≅v∈α[u]) = ⨆-fwd-bwd-id (u , u∈α , v∈α[u])
       open EqReasoning ≋[ 𝒫 ]-setoid in
       begin
-        wkElFam[ 𝒫 ] (⨆-pres-≼ α≼α' α[_]) (joinElFam α[_] tr) v'∈⨆α'[-]
+        wkElFam[ 𝒫 ] (⨆-pres-≼ α≼α' α[_]) (joinElFam[ 𝒫 ] α[_] tr) v'∈⨆α'[-]
           ≡⟨⟩ -- expand wkElFam
-        wk[ 𝒫 ] v⊆v' (joinElFam α[_] tr v∈⨆α[-])
+        wk[ 𝒫 ] v⊆v' (joinElFam[ 𝒫 ] α[_] tr v∈⨆α[-])
           ≡⟨⟩ -- expand joinElFam
         wk[ 𝒫 ] v⊆v' (tr {zᵤ} zᵤ∈α v∈α[zᵤ])
           ≈⟨ wk[ 𝒫 ]-pres-≋ v⊆v' (≋[ 𝒫 ]-cong-ElTree tr zᵤ≡u zᵤ∈α≅u∈α v∈α[zᵤ]≅v∈α[u]) ⟩
@@ -173,11 +168,11 @@ join[ 𝒫 ] = record
           ≡⟨⟩ -- contract wkElTree
         wkElTree[ 𝒫 ] α≼α' tr u'∈α' v'∈α'[u']
           ≡⟨⟩ -- contract joinElFam
-        joinElFam α'[_] (wkElTree[ 𝒫 ] α≼α' tr) v'∈⨆α'[-]
+        joinElFam[ 𝒫 ] α'[_] (wkElTree[ 𝒫 ] α≼α' tr) v'∈⨆α'[-]
           ∎
 
   join-fun : 𝒞-Fam (𝒞 𝒫) w → 𝒞-Fam 𝒫 w
-  join-fun (elem α fam) = elem (⨆ (cov ∘ fam)) (joinElFam (cov ∘ fam) (elems ∘ fam))
+  join-fun (elem α fam) = elem (⨆ (cov ∘ fam)) (joinElFam[ 𝒫 ] (cov ∘ fam) (elems ∘ fam))
 
   opaque
     join-fun-pres-≋ : {cx cx' : 𝒞-Fam (𝒞 𝒫) w}
@@ -190,19 +185,18 @@ join[ 𝒫 ] = record
     join-fun-natural : (i : w ⊆ w') (p : (𝒞 (𝒞 𝒫)) ₀ w) →
       wk[ 𝒞 𝒫 ] i (join-fun p) ≋[ 𝒞 𝒫 ] join-fun (wk[ 𝒞 (𝒞 𝒫) ] i p)
     join-fun-natural i (elem α fam) = let
-      α[_] : KFam α
-      α[_] = cov ∘ fam
-      tr : {u : W} (p : u ∈ α) → ElFam[ 𝒫 ] α[ p ]
-      tr = elems ∘ fam
-      (rjα≡jrα , is≋is') = refine-coh-joinN i α α[_]
-      in proof rjα≡jrα λ {v} {p} {p'} p≅p' →
-        let open EqReasoning ≋[ 𝒫 ]-setoid
-        in begin
-          wkElFam[ 𝒫 ] (refine i $≼ (⨆ α[_])) (joinElFam α[_] tr) p
-            ≈⟨ wkElFam-pres-≋-left {𝒫  = 𝒫} is≋is' (joinElFam α[_] tr) p≅p' ⟩
-          wkElFam[ 𝒫 ] (⨆-pres-≼ (refine i $≼ α) α[_]) (joinElFam α[_] tr) p'
+        α[_] : KFam α
+        α[_] = cov ∘ fam
+        tr : {u : W} (p : u ∈ α) → ElFam[ 𝒫 ] α[ p ]
+        tr = elems ∘ fam
+        (rjα≡jrα , is≋is') = refine-coh-joinN i α α[_]
+      in proof rjα≡jrα λ {v} {p} {p'} p≅p' → let open EqReasoning ≋[ 𝒫 ]-setoid in
+        begin
+          wkElFam[ 𝒫 ] (refine i $≼ (⨆ α[_])) (joinElFam[ 𝒫 ] α[_] tr) p
+            ≈⟨ wkElFam-pres-≋-left {𝒫  = 𝒫} is≋is' (joinElFam[ 𝒫 ] α[_] tr) p≅p' ⟩
+          wkElFam[ 𝒫 ] (⨆-pres-≼ (refine i $≼ α) α[_]) (joinElFam[ 𝒫 ] α[_] tr) p'
             ≈⟨ joinElFam-natural {tr = tr} (refine i $≼ α) ≅-refl ⟩
-          joinElFam (wkNFam (refine i $≼ α) α[_]) (wkElTree[ 𝒫 ] (refine i $≼ α) tr) p'
+          joinElFam[ 𝒫 ] (wkNFam (refine i $≼ α) α[_]) (wkElTree[ 𝒫 ] (refine i $≼ α) tr) p'
             ∎
 
 opaque

@@ -5,8 +5,8 @@ import Frame.FDFrame as FDF
 
 module Presheaf.Functor.Possibility.Base
   {W    : Set}
-  {_⊆_  : (w w' : W) → Set}
-  {IF   : IFrame W _⊆_}
+  {_⊑_  : (w w' : W) → Set}
+  {IF   : IFrame W _⊑_}
   {_R_  : (w v : W) → Set}
   (let open FDF IF _R_)
   (DF   : DFrame)
@@ -92,19 +92,19 @@ syntax ◇-≋[]-syn 𝒫 x y = x ◇-≋[ 𝒫 ] y
      ; trans = ◇-≋-trans
      }
 
-   wk-◇ : w ⊆ w' → ◇-Fam 𝒫 w → ◇-Fam 𝒫 w'
-   wk-◇ i (elem (v , r , p)) = elem (factorW i r , factorR i r , wk[ 𝒫 ] (factor⊆ i r) p)
+   wk-◇ : w ⊑ w' → ◇-Fam 𝒫 w → ◇-Fam 𝒫 w'
+   wk-◇ i (elem (v , r , p)) = elem (factorW i r , factorR i r , wk[ 𝒫 ] (factor⊑ i r) p)
 
    opaque
-     wk-◇-pres-≋ : (i : w ⊆ w') {x y : ◇-Fam 𝒫 w} → x ◇-≋ y → wk-◇ i x ◇-≋ wk-◇ i y
+     wk-◇-pres-≋ : (i : w ⊑ w') {x y : ◇-Fam 𝒫 w} → x ◇-≋ y → wk-◇ i x ◇-≋ wk-◇ i y
      wk-◇-pres-≋ _i (proof (≡-refl , ≡-refl , p≋p')) = proof (≡-refl , ≡-refl , wk[ 𝒫 ]-pres-≋ _ p≋p')
 
-     wk-◇-pres-refl : (x : ◇-Fam 𝒫 w) → wk-◇ ⊆-refl x ◇-≋ x
-     wk-◇-pres-refl (elem (v , r , p)) rewrite factor-pres-⊆-refl r = proof (≡-refl , (≡-refl , wk[ 𝒫 ]-pres-refl p))
+     wk-◇-pres-refl : (x : ◇-Fam 𝒫 w) → wk-◇ ⊑-refl x ◇-≋ x
+     wk-◇-pres-refl (elem (v , r , p)) rewrite factor-pres-⊑-refl r = proof (≡-refl , (≡-refl , wk[ 𝒫 ]-pres-refl p))
 
-     wk-◇-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') (x : ◇-Fam 𝒫 w)
-       → wk-◇ (⊆-trans i i') x ◇-≋ wk-◇ i' (wk-◇ i x)
-     wk-◇-pres-trans i i' (elem (v , r , p)) rewrite factor-pres-⊆-trans i i' r = proof (≡-refl , (≡-refl , wk[ 𝒫 ]-pres-trans _ _ p))
+     wk-◇-pres-trans : (i : w ⊑ w') (i' : w' ⊑ w'') (x : ◇-Fam 𝒫 w)
+       → wk-◇ (⊑-trans i i') x ◇-≋ wk-◇ i' (wk-◇ i x)
+     wk-◇-pres-trans i i' (elem (v , r , p)) rewrite factor-pres-⊑-trans i i' r = proof (≡-refl , (≡-refl , wk[ 𝒫 ]-pres-trans _ _ p))
 
 ---------------------------
 -- ◇ is a presheaf functor

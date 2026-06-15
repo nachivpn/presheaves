@@ -4,8 +4,8 @@ import Frame.FDFrame as FDF
 
 module Presheaf.Functor.Possibility.Strong.Pointed
   {W   : Set}
-  {_⊆_ : (w w' : W) → Set}
-  {IF  : IFrame W _⊆_}
+  {_⊑_ : (w w' : W) → Set}
+  {IF  : IFrame W _⊑_}
   {_R_ : (w v : W) → Set}
   (let open FDF IF _R_)
   (DF  : DFrame)
@@ -42,7 +42,7 @@ module StrongPointed (PDF : PointedDFrame) (IPDF : InclusivePointedDFrame IDF PD
 
     ◇-strong-point : strength[ 𝒫 , 𝒬 ] ∘' id'[ 𝒫 ] ×'-map point[ 𝒬 ] ≈̇ point[ 𝒫 ×' 𝒬 ]
     ◇-strong-point {𝒫} {𝒬} = proof-≈̇ (λ _ → proof (≡-refl , ≡-refl
-      , proof (wk[ 𝒫 ]-pres-≡-≋ R-to-⊆-pres-R-point ≋[ 𝒫 ]-refl , ≋[ 𝒬 ]-refl)))
+      , proof (wk[ 𝒫 ]-pres-≡-≋ R-to-⊑-pres-R-point ≋[ 𝒫 ]-refl , ≋[ 𝒬 ]-refl)))
 
 module InclusiveReflexive (RDF : ReflexiveDFrame) (IRDF : InclusiveReflexiveDFrame IDF RDF) where
 
@@ -58,7 +58,7 @@ module InclusiveReflexive (RDF : ReflexiveDFrame) (IRDF : InclusiveReflexiveDFra
       , ≡-refl
       , proof
         ((let open EqReasoning ≋[ 𝒫 ]-setoid in begin
-          wk[ 𝒫 ] (R-to-⊆ R-refl) p   ≡⟨ cong₂ wk[ 𝒫 ] R-to-⊆-pres-refl ≡-refl ⟩
-          wk[ 𝒫 ] (⊆-refl) p          ≈⟨ wk[ 𝒫 ]-pres-refl p ⟩
+          wk[ 𝒫 ] (R-to-⊑ R-refl) p   ≡⟨ cong₂ wk[ 𝒫 ] R-to-⊑-pres-refl ≡-refl ⟩
+          wk[ 𝒫 ] (⊑-refl) p          ≈⟨ wk[ 𝒫 ]-pres-refl p ⟩
           p                           ∎)
         , ≋[ 𝒬 ]-refl)))

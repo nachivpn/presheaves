@@ -18,6 +18,7 @@ open import Presheaf.Functor.Possibility.Strong.Joinable
 
 -- requires --with-K
 open import Presheaf.Functor.Cover.Base
+open import Presheaf.Functor.Cover.WeaklyPointed
 open import Presheaf.Functor.Cover.Pointed
 open import Presheaf.Functor.Cover.Strong.Base
 open import Presheaf.Functor.Cover.Joinable

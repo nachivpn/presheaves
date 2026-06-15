@@ -5,8 +5,8 @@ import Frame.FDFrame as FDF
 
 module Presheaf.Functor.Lax
   {W    : Set}
-  {_⊆_  : (w w' : W) → Set}
-  {IF   : IFrame W _⊆_}
+  {_⊑_  : (w w' : W) → Set}
+  {IF   : IFrame W _⊑_}
   {_R_  : (w v : W) → Set}
   (let open FDF IF _R_)
   (DF   : DFrame)
@@ -37,16 +37,16 @@ private
 record ◯-Fam (𝒫 : Psh) (w : W) : Set where
   constructor elem
   field
-      fun     : {w' : W} → (i : w ⊆ w') → ◇-Fam 𝒫 w'
-      natural : (i : w ⊆ w') (i' : w' ⊆ w'')
-        → wk[ ◇ 𝒫 ] i' (fun i) ≋[ ◇ 𝒫 ] fun (⊆-trans i i')
+      fun     : {w' : W} → (i : w ⊑ w') → ◇-Fam 𝒫 w'
+      natural : (i : w ⊑ w') (i' : w' ⊑ w'')
+        → wk[ ◇ 𝒫 ] i' (fun i) ≋[ ◇ 𝒫 ] fun (⊑-trans i i')
 
 open ◯-Fam renaming (fun to apply-◯) public
 
 record _◯-≋_ {𝒫 : Psh} {w : W} (f f' : ◯-Fam 𝒫 w) : Set where
     constructor proof
     field
-      pw : {w' : W} → (i : w ⊆ w') → (f .apply-◯ i) ◇-≋[ 𝒫 ] (f' .apply-◯ i)
+      pw : {w' : W} → (i : w ⊑ w') → (f .apply-◯ i) ◇-≋[ 𝒫 ] (f' .apply-◯ i)
 
 open _◯-≋_ using (pw) public
 
@@ -90,25 +90,25 @@ syntax ◯-≋[]-syn 𝒫 x y = x ◯-≋[ 𝒫 ] y
       ; trans = ◯-≋-trans
       }
 
-    wk : w ⊆ w' → ◯-Fam 𝒫 w → ◯-Fam 𝒫 w'
+    wk : w ⊑ w' → ◯-Fam 𝒫 w → ◯-Fam 𝒫 w'
     wk i f = record
-      { fun = λ i' → f .apply-◯ (⊆-trans i i')
+      { fun = λ i' → f .apply-◯ (⊑-trans i i')
       ; natural = λ i' i'' → let open EqReasoning ≋[ ◇ 𝒫 ]-setoid in begin
-        wk[ ◇ 𝒫 ] i'' (f .apply-◯ (⊆-trans i i'))
-          ≈⟨ f .natural (⊆-trans i i') i'' ⟩
-        f .apply-◯ (⊆-trans (⊆-trans i i') i'')
-          ≡⟨ cong (f .apply-◯) (⊆-trans-assoc i i' i'') ⟩
-        f .apply-◯ (⊆-trans i (⊆-trans i' i'')) ∎ }
+        wk[ ◇ 𝒫 ] i'' (f .apply-◯ (⊑-trans i i'))
+          ≈⟨ f .natural (⊑-trans i i') i'' ⟩
+        f .apply-◯ (⊑-trans (⊑-trans i i') i'')
+          ≡⟨ cong (f .apply-◯) (⊑-trans-assoc i i' i'') ⟩
+        f .apply-◯ (⊑-trans i (⊑-trans i' i'')) ∎ }
 
     opaque
-      wk-pres-≋ : (i : w ⊆ w') {f f' : ◯-Fam 𝒫 w} (f≋f' : f ◯-≋ f') → wk i f ◯-≋ wk i f'
-      wk-pres-≋ i f≋f' = proof λ i' → f≋f' .pw (⊆-trans i i')
+      wk-pres-≋ : (i : w ⊑ w') {f f' : ◯-Fam 𝒫 w} (f≋f' : f ◯-≋ f') → wk i f ◯-≋ wk i f'
+      wk-pres-≋ i f≋f' = proof λ i' → f≋f' .pw (⊑-trans i i')
 
-      wk-pres-refl : (f : ◯-Fam 𝒫 w) → wk ⊆-refl f ◯-≋ f
-      wk-pres-refl f = proof (λ i → ≡-to-◇-≋ (cong (f .apply-◯) (⊆-trans-unit-left i)))
+      wk-pres-refl : (f : ◯-Fam 𝒫 w) → wk ⊑-refl f ◯-≋ f
+      wk-pres-refl f = proof (λ i → ≡-to-◇-≋ (cong (f .apply-◯) (⊑-trans-unit-left i)))
 
-      wk-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') (f : ◯-Fam 𝒫 w) → wk (⊆-trans i i') f ◯-≋ wk i' (wk i f)
-      wk-pres-trans i i' f = proof (λ i'' → ≡-to-◇-≋ (cong (f .apply-◯) (⊆-trans-assoc i i' i'')))
+      wk-pres-trans : (i : w ⊑ w') (i' : w' ⊑ w'') (f : ◯-Fam 𝒫 w) → wk (⊑-trans i i') f ◯-≋ wk i' (wk i f)
+      wk-pres-trans i i' f = proof (λ i'' → ≡-to-◇-≋ (cong (f .apply-◯) (⊑-trans-assoc i i' i'')))
 
 ---------------------------
 -- ◯ is a presheaf functor
@@ -123,7 +123,7 @@ syntax ◯-≋[]-syn 𝒫 x y = x ◯-≋[ 𝒫 ] y
           ≈⟨ (◇-map t) .natural i' (p .apply-◯ i) ⟩
         (◇-map t) .apply (wk[ ◇ 𝒫 ] i' (p .apply-◯ i))
           ≈⟨ (◇-map t) .apply-≋ (p .natural i i') ⟩
-        (◇-map t) .apply (p .apply-◯ (⊆-trans i i')) ∎ }
+        (◇-map t) .apply (p .apply-◯ (⊑-trans i i')) ∎ }
     ; pres-≋  = λ p≋p' → proof λ i → (◇-map t) .apply-≋ (p≋p' .pw i)
     ; natural = λ i p → proof λ i' → ≋[ ◇ 𝒬 ]-refl
     }
@@ -148,17 +148,17 @@ module ◯≅◇ where
 
   ◯≅◇-forth[_] : (𝒫 : Psh) → ◯ 𝒫 →̇ ◇ 𝒫
   ◯≅◇-forth[ 𝒫 ] = record
-    { fun     = λ ◯p → ◯p .apply-◯ ⊆-refl
-    ; pres-≋  = λ ◯p≋◯p' → ◯p≋◯p' .pw ⊆-refl
+    { fun     = λ ◯p → ◯p .apply-◯ ⊑-refl
+    ; pres-≋  = λ ◯p≋◯p' → ◯p≋◯p' .pw ⊑-refl
     ; natural = λ i p → let open EqReasoning ≋[ ◇ 𝒫 ]-setoid in
       begin
-      wk[ ◇ 𝒫 ] i (p .apply-◯ ⊆-refl)
-        ≈⟨ p .natural ⊆-refl i ⟩
-      p .apply-◯ (⊆-trans ⊆-refl i)
-        ≡⟨ cong (p .apply-◯) (≡-trans (⊆-trans-unit-left _) (≡-sym (⊆-trans-unit-right _))) ⟩
-      p .apply-◯ (⊆-trans i ⊆-refl)
+      wk[ ◇ 𝒫 ] i (p .apply-◯ ⊑-refl)
+        ≈⟨ p .natural ⊑-refl i ⟩
+      p .apply-◯ (⊑-trans ⊑-refl i)
+        ≡⟨ cong (p .apply-◯) (≡-trans (⊑-trans-unit-left _) (≡-sym (⊑-trans-unit-right _))) ⟩
+      p .apply-◯ (⊑-trans i ⊑-refl)
         ≡⟨⟩
-      wk[ ◯ 𝒫 ] i p .apply-◯ ⊆-refl ∎ }
+      wk[ ◯ 𝒫 ] i p .apply-◯ ⊑-refl ∎ }
 
   -- ◯≅◇-forth[_] is a natural transformation (in the category of presheaf functors)
   ◯≅◇-forth-nat : (f : 𝒫 →̇ 𝒬) → ◯≅◇-forth[ 𝒬 ] ∘' ◯-map f ≈̇  (◇-map f) ∘' ◯≅◇-forth[ 𝒫 ]
@@ -187,10 +187,10 @@ module ◯≅◇ where
   ◯≅◇-back-left-inverse : ◯≅◇-back[ 𝒫 ] ∘' ◯≅◇-forth[ 𝒫 ] ≈̇ id'[ ◯ 𝒫 ]
   ◯≅◇-back-left-inverse {𝒫} = proof-≈̇ λ p → proof λ i →
     let open EqReasoning ≋[ ◇ 𝒫 ]-setoid in begin
-        wk[ ◇ 𝒫 ] i (p .apply-◯ ⊆-refl)
+        wk[ ◇ 𝒫 ] i (p .apply-◯ ⊑-refl)
           ≈⟨ ◯≅◇-forth[ 𝒫 ] .natural i p ⟩
-        p .apply-◯ (⊆-trans i ⊆-refl)
-          ≡⟨ cong (p .apply-◯) (⊆-trans-unit-right i) ⟩
+        p .apply-◯ (⊑-trans i ⊑-refl)
+          ≡⟨ cong (p .apply-◯) (⊑-trans-unit-right i) ⟩
         p .apply-◯ i ∎
 
 

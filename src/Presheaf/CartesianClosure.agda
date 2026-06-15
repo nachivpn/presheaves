@@ -4,8 +4,8 @@ open import Frame.IFrame
 
 module Presheaf.CartesianClosure
   {W   : Set}
-  {_⊆_ : (w w' : W) → Set}
-  (IF  : IFrame W _⊆_)
+  {_⊑_ : (w w' : W) → Set}
+  (IF  : IFrame W _⊑_)
   (let open IFrame IF)
   where
 
@@ -30,7 +30,7 @@ import Relation.Binary.Reasoning.Setoid as EqReasoning
 private
   variable
     w v              : W
-    i i' i''         : w ⊆ v
+    i i' i''         : w ⊑ v
     𝒫 𝒫' 𝒬 𝒬' ℛ ℛ' : Psh
     s s' t t' u u'   : 𝒫 →̇ 𝒬
 
@@ -193,16 +193,16 @@ module _ (𝒫 𝒬 : Psh) where
   record →'-Fam (w : W) : Set where
     constructor elem
     field
-      fun     : {w' : W} → (i : w ⊆ w') → P w' → Q w'
-      pres-≋  : ∀ {w' : W} → (i : w ⊆ w') {p p' : P w'} → (p≋p' : p ≋[ 𝒫 ] p') → fun i p ≋[ 𝒬 ] fun i p'
-      natural : ∀ {w' w'' : W} (i : w ⊆ w') (i' : w' ⊆ w'') (p : P w') → wk[ 𝒬 ] i' (fun i p) ≋[ 𝒬 ] fun (⊆-trans i i') (wk[ 𝒫 ] i' p)
+      fun     : {w' : W} → (i : w ⊑ w') → P w' → Q w'
+      pres-≋  : ∀ {w' : W} → (i : w ⊑ w') {p p' : P w'} → (p≋p' : p ≋[ 𝒫 ] p') → fun i p ≋[ 𝒬 ] fun i p'
+      natural : ∀ {w' w'' : W} (i : w ⊑ w') (i' : w' ⊑ w'') (p : P w') → wk[ 𝒬 ] i' (fun i p) ≋[ 𝒬 ] fun (⊑-trans i i') (wk[ 𝒫 ] i' p)
 
   open →'-Fam using (natural) renaming (fun to apply; pres-≋ to apply-≋) public
 
   record _→'-≋_ {w : W} (f g : →'-Fam w) : Set where
     constructor proof
     field
-      pw : ∀ {v : W} (i : w ⊆ v) (p : P v) → f .apply i p ≋[ 𝒬 ] g .apply i p
+      pw : ∀ {v : W} (i : w ⊑ v) (p : P v) → f .apply i p ≋[ 𝒬 ] g .apply i p
 
   open _→'-≋_ using (pw) public
 
@@ -218,18 +218,18 @@ module _ (𝒫 𝒬 : Psh) where
   _→'_ = record
     { Fam           = →'-Fam
     ; _≋_           = _→'-≋_
-    ; wk            = λ i f → elem (λ i' p → f .apply (⊆-trans i i') p)
-                                   (λ i' p≋p' → f .apply-≋ (⊆-trans i i') p≋p')
-                                   (λ i' i'' p → subst (λ hole → wk[ 𝒬 ] i'' (f .apply (⊆-trans i i') p) ≋[ 𝒬 ] f .apply hole (wk[ 𝒫 ] i'' p)) (⊆-trans-assoc i i' i'') (f .natural (⊆-trans i i') i'' p))
+    ; wk            = λ i f → elem (λ i' p → f .apply (⊑-trans i i') p)
+                                   (λ i' p≋p' → f .apply-≋ (⊑-trans i i') p≋p')
+                                   (λ i' i'' p → subst (λ hole → wk[ 𝒬 ] i'' (f .apply (⊑-trans i i') p) ≋[ 𝒬 ] f .apply hole (wk[ 𝒫 ] i'' p)) (⊑-trans-assoc i i' i'') (f .natural (⊑-trans i i') i'' p))
     ; ≋-equiv       = →'-≋-equiv
-    ; wk-pres-≋     = λ i f≋g → proof (λ i' → f≋g .pw (⊆-trans i i'))
-    ; wk-pres-refl  = λ f → proof (λ i p → ≋[ 𝒬 ]-reflexive (cong (λ hole → f .apply hole p) (⊆-trans-unit-left i)))
-    ; wk-pres-trans = λ i i' f → proof (λ i'' p → ≋[ 𝒬 ]-reflexive˘ (cong (λ hole → f .apply hole p) (≡-sym (⊆-trans-assoc i i' i''))))
+    ; wk-pres-≋     = λ i f≋g → proof (λ i' → f≋g .pw (⊑-trans i i'))
+    ; wk-pres-refl  = λ f → proof (λ i p → ≋[ 𝒬 ]-reflexive (cong (λ hole → f .apply hole p) (⊑-trans-unit-left i)))
+    ; wk-pres-trans = λ i i' f → proof (λ i'' p → ≋[ 𝒬 ]-reflexive˘ (cong (λ hole → f .apply hole p) (≡-sym (⊑-trans-assoc i i' i''))))
     }
 
 module _ {𝒫 𝒬 : Psh} where
   private
-    →'-≋-apply-sq : ∀ {f g : 𝒫 →' 𝒬 ₀ w} (_f≋g : f ≋[ 𝒫 →' 𝒬 ] g) (i : w ⊆ v) {p p' : 𝒫 ₀ v} → (_p≋p' : p ≋[ 𝒫 ] p') → f .apply i p ≋[ 𝒬 ] g .apply i p'
+    →'-≋-apply-sq : ∀ {f g : 𝒫 →' 𝒬 ₀ w} (_f≋g : f ≋[ 𝒫 →' 𝒬 ] g) (i : w ⊑ v) {p p' : 𝒫 ₀ v} → (_p≋p' : p ≋[ 𝒫 ] p') → f .apply i p ≋[ 𝒬 ] g .apply i p'
     →'-≋-apply-sq {_w} {_v} {f} {g} f≋g i {p} {p'} p≋p' = let open EqReasoning ≋[ 𝒬 ]-setoid in begin
       f .apply i p   ≈⟨ f .apply-≋ i p≋p' ⟩
       f .apply i p'  ≈⟨ f≋g .pw i p' ⟩
@@ -237,21 +237,21 @@ module _ {𝒫 𝒬 : Psh} where
 
   app' : (t : ℛ →̇ 𝒫 →' 𝒬) → (u : ℛ →̇ 𝒫) → ℛ →̇ 𝒬
   app' {ℛ} t u = record
-    { fun     = λ r → t .apply r .apply ⊆-refl (u .apply r)
-    ; pres-≋  = λ r≋r' → →'-≋-apply-sq (t .apply-≋ r≋r') ⊆-refl (u .apply-≋ r≋r')
+    { fun     = λ r → t .apply r .apply ⊑-refl (u .apply r)
+    ; pres-≋  = λ r≋r' → →'-≋-apply-sq (t .apply-≋ r≋r') ⊑-refl (u .apply-≋ r≋r')
     ; natural = λ i r → let open EqReasoning ≋[ 𝒬 ]-setoid in begin
-        wk[ 𝒬 ] i (t .apply r .apply ⊆-refl (u .apply r))                   ≈⟨ t .apply r .natural ⊆-refl i (u .apply r) ⟩
-        t .apply r .apply (⊆-trans ⊆-refl i) (wk[ 𝒫 ] i (u .apply r))       ≈⟨ t .apply r .apply-≋ (⊆-trans ⊆-refl i) (u .natural i r) ⟩
-        t .apply r .apply (⊆-trans ⊆-refl i) (u .apply (wk[ ℛ ] i r))       ≡⟨ cong (λ hole → t .apply r .apply hole (u .apply (wk[ ℛ ] i r))) (⊆-trans-unit-left i) ⟩
-        t .apply r .apply i                  (u .apply (wk[ ℛ ] i r))       ≡˘⟨ cong (λ hole → t .apply r .apply hole (u .apply (wk[ ℛ ] i r))) (⊆-trans-unit-right i) ⟩
-        t .apply r .apply (⊆-trans i ⊆-refl) (u .apply (wk[ ℛ ] i r))       ≡⟨⟩
-        wk[ 𝒫 →' 𝒬 ] i (t .apply r) .apply ⊆-refl (u .apply (wk[ ℛ ] i r))  ≈⟨ t .natural i r .pw ⊆-refl (u .apply (wk[ ℛ ] i r)) ⟩
-        t .apply (wk[ ℛ ] i r) .apply ⊆-refl (u .apply (wk[ ℛ ] i r))       ∎
+        wk[ 𝒬 ] i (t .apply r .apply ⊑-refl (u .apply r))                   ≈⟨ t .apply r .natural ⊑-refl i (u .apply r) ⟩
+        t .apply r .apply (⊑-trans ⊑-refl i) (wk[ 𝒫 ] i (u .apply r))       ≈⟨ t .apply r .apply-≋ (⊑-trans ⊑-refl i) (u .natural i r) ⟩
+        t .apply r .apply (⊑-trans ⊑-refl i) (u .apply (wk[ ℛ ] i r))       ≡⟨ cong (λ hole → t .apply r .apply hole (u .apply (wk[ ℛ ] i r))) (⊑-trans-unit-left i) ⟩
+        t .apply r .apply i                  (u .apply (wk[ ℛ ] i r))       ≡˘⟨ cong (λ hole → t .apply r .apply hole (u .apply (wk[ ℛ ] i r))) (⊑-trans-unit-right i) ⟩
+        t .apply r .apply (⊑-trans i ⊑-refl) (u .apply (wk[ ℛ ] i r))       ≡⟨⟩
+        wk[ 𝒫 →' 𝒬 ] i (t .apply r) .apply ⊑-refl (u .apply (wk[ ℛ ] i r))  ≈⟨ t .natural i r .pw ⊑-refl (u .apply (wk[ ℛ ] i r)) ⟩
+        t .apply (wk[ ℛ ] i r) .apply ⊑-refl (u .apply (wk[ ℛ ] i r))       ∎
     }
 
   opaque
     app'-pres-≈̇ : t ≈̇ t' → u ≈̇ u' → app' t u ≈̇ app' t' u'
-    app'-pres-≈̇ t≈̇t' u≈̇u' = proof-≈̇ (λ r → →'-≋-apply-sq (apply-≈̇ t≈̇t' r) ⊆-refl (apply-≈̇ u≈̇u' r))
+    app'-pres-≈̇ t≈̇t' u≈̇u' = proof-≈̇ (λ r → →'-≋-apply-sq (apply-≈̇ t≈̇t' r) ⊑-refl (apply-≈̇ u≈̇u' r))
 
     app'-nat : ∀ (t : ℛ →̇ 𝒫 →' 𝒬) (u : ℛ →̇ 𝒫) (s : ℛ' →̇ ℛ) → app' t u ∘' s ≈̇ app' (t ∘' s) (u ∘' s)
     app'-nat _t _u _s = proof-≈̇ (λ _r' → ≋[ 𝒬 ]-refl)
@@ -270,7 +270,7 @@ lam' {ℛ} {𝒫} {𝒬} t = record
                 ; natural = λ i i' p → let open EqReasoning ≋[ 𝒬 ]-setoid in begin
                     wk[ 𝒬 ] i' (t .apply (elem (wk[ ℛ ] i r , p)))             ≈⟨ t .natural i' (elem (wk[ ℛ ] i r , p)) ⟩
                     t .apply (elem (wk[ ℛ ] i' (wk[ ℛ ] i r) , wk[ 𝒫 ] i' p))  ≈˘⟨ t .apply-≋ (proof (wk[ ℛ ]-pres-trans i i' r , ≋[ 𝒫 ]-refl)) ⟩
-                    t .apply (elem (wk[ ℛ ] (⊆-trans i i') r , wk[ 𝒫 ] i' p))  ∎
+                    t .apply (elem (wk[ ℛ ] (⊑-trans i i') r , wk[ 𝒫 ] i' p))  ∎
                 }
   ; pres-≋  = λ r≋r' → proof λ i p → t .apply-≋ (proof (wk[ ℛ ]-pres-≋ i r≋r' , ≋[ 𝒫 ]-refl))
   ; natural = λ i r → proof λ i' p → t .apply-≋ (proof ((wk[ ℛ ]-pres-trans i i' r) , ≋[ 𝒫 ]-refl))
@@ -288,8 +288,8 @@ opaque
 
   →'-eta : ∀ (t : ℛ →̇ 𝒫 →' 𝒬) → t ≈̇ lam' {𝒬 = 𝒬} (app' (t [ π₁'[ 𝒫 ] ]') π₂'[ ℛ ])
   →'-eta {ℛ} {𝒫} {𝒬} t = proof-≈̇ (λ r → proof (λ i p → let open EqReasoning ≋[ 𝒬 ]-setoid in begin
-                             t .apply r .apply i p                        ≡˘⟨ cong (λ hole → t .apply r .apply hole p) (⊆-trans-unit-right i) ⟩
-                             t .apply r .apply (⊆-trans i ⊆-refl) p       ≡⟨⟩
-                             wk[ 𝒫 →' 𝒬 ] i (t .apply r) .apply ⊆-refl p  ≈⟨ t .natural i r .pw ⊆-refl p ⟩
-                             t .apply (wk[ ℛ ] i r) .apply ⊆-refl p       ∎
+                             t .apply r .apply i p                        ≡˘⟨ cong (λ hole → t .apply r .apply hole p) (⊑-trans-unit-right i) ⟩
+                             t .apply r .apply (⊑-trans i ⊑-refl) p       ≡⟨⟩
+                             wk[ 𝒫 →' 𝒬 ] i (t .apply r) .apply ⊑-refl p  ≈⟨ t .natural i r .pw ⊑-refl p ⟩
+                             t .apply (wk[ ℛ ] i r) .apply ⊑-refl p       ∎
                           ))

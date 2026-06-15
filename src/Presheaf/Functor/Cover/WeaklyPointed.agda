@@ -8,8 +8,8 @@ import Relation.Binary.Reasoning.Setoid as EqReasoning
 
 module Presheaf.Functor.Cover.WeaklyPointed
   {W    : Set}
-  {_⊆_  : (w w' : W) → Set}
-  (IF   : IFrame W _⊆_)
+  {_⊑_  : (w w' : W) → Set}
+  (IF   : IFrame W _⊑_)
   (let open CF IF)
   (K   : W → Set)
   (_∈_ : (v : W) {w : W} → K w → Set)
@@ -64,21 +64,21 @@ point[ 𝒫 ] = record
     point-fun-pres-≋ : {x y : 𝒫 ₀ w} → x ≋[ 𝒫 ] y → point-fun x 𝒞-≋ point-fun y
     point-fun-pres-≋ {x = x} {y} x≋y = proof ≡-refl λ { ≅-refl → wk[ 𝒫 ]-pres-≋ _ x≋y }
 
-    point-fam-natural : (i : w ⊆ w') (x : 𝒫 ₀ w)
+    point-fam-natural : (i : w ⊑ w') (x : 𝒫 ₀ w)
       → ElFam[ 𝒫 ]≋ (wkElFam[ 𝒫 ] (pointN-pres-≼ i) (point-fam x) ) (point-fam (wk[ 𝒫 ] i x))
     point-fam-natural {w = w} {w'} i x {v} {p} ≅-refl = let open EqReasoning ≋[ 𝒫 ]-setoid in begin
       wkElFam[ 𝒫 ] (pointN-pres-≼ i) (point-fam x) p
         ≡⟨⟩
-      wk[ 𝒫 ] (⊆-trans i (pointN-bwd-reachable p)) (wk[ 𝒫 ] (pointN-bwd-reachable pointN-fwd-member[ w ]) x)
+      wk[ 𝒫 ] (⊑-trans i (pointN-bwd-reachable p)) (wk[ 𝒫 ] (pointN-bwd-reachable pointN-fwd-member[ w ]) x)
         ≈⟨ wk[ 𝒫 ]-pres-≋ _ (wk[ 𝒫 ]-pres-≡-≋ pointN-coh[ w ] ≋[ 𝒫 ]-refl) ⟩
-      wk[ 𝒫 ] (⊆-trans i (pointN-bwd-reachable p)) (wk[ 𝒫 ] ⊆-refl[ w ] x)
+      wk[ 𝒫 ] (⊑-trans i (pointN-bwd-reachable p)) (wk[ 𝒫 ] ⊑-refl[ w ] x)
         ≈⟨ wk[ 𝒫 ]-pres-≋ _ (wk[ 𝒫 ]-pres-refl x) ⟩
-      wk[ 𝒫 ] (⊆-trans i (pointN-bwd-reachable p)) x
+      wk[ 𝒫 ] (⊑-trans i (pointN-bwd-reachable p)) x
         ≈⟨ wk[ 𝒫 ]-pres-trans i (pointN-bwd-reachable p) x ⟩
       wk[ 𝒫 ] (pointN-bwd-reachable p) (wk[ 𝒫 ] i x)
         ∎
 
-    point-fun-natural : (i : w ⊆ w') (x : 𝒫 ₀ w) → wk[ 𝒞 𝒫 ] i (point-fun x) ≋[ 𝒞 𝒫 ] point-fun (wk[ 𝒫 ] i x)
+    point-fun-natural : (i : w ⊑ w') (x : 𝒫 ₀ w) → wk[ 𝒞 𝒫 ] i (point-fun x) ≋[ 𝒞 𝒫 ] point-fun (wk[ 𝒫 ] i x)
     point-fun-natural i x = let (k≡k' , is≋is') = refine-coh-pointN i
       in proof k≡k' λ {v} {p} {p'} p≅p' → let open EqReasoning ≋[ 𝒫 ]-setoid in begin
         wkElFam[ 𝒫 ] (refine i $≼ _) (point-fam x) p

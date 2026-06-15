@@ -5,8 +5,8 @@ import Frame.FDFrame as FDF
 
 module Presheaf.Functor.Possibility.Properties
   {W    : Set}
-  {_⊆_  : (w w' : W) → Set}
-  {IF   : IFrame W _⊆_}
+  {_⊑_  : (w w' : W) → Set}
+  {IF   : IFrame W _⊑_}
   {_R_  : (w v : W) → Set}
   (let open FDF IF _R_)
   (DF   : DFrame)
@@ -46,14 +46,14 @@ private
 -D_ : (v : W) → Psh
 -D v = ◇ (-⊇ v)
 
--D-mapᵒ_ : w ⊆ v → (-D v) →̇ (-D w)
+-D-mapᵒ_ : w ⊑ v → (-D v) →̇ (-D w)
 -D-mapᵒ i = ◇-map (-⊇-mapᵒ i)
 
 opaque
-  -D-mapᵒ-pres-refl : -D-mapᵒ ⊆-refl[ w ] ≈̇ id'
+  -D-mapᵒ-pres-refl : -D-mapᵒ ⊑-refl[ w ] ≈̇ id'
   -D-mapᵒ-pres-refl = ≈̇-trans (◇-map-pres-≈̇ -⊇-mapᵒ-pres-refl) ◇-map-pres-id
 
-  -D-mapᵒ-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') → -D-mapᵒ (⊆-trans i i') ≈̇ -D-mapᵒ i ∘' -D-mapᵒ i'
+  -D-mapᵒ-pres-trans : (i : w ⊑ w') (i' : w' ⊑ w'') → -D-mapᵒ (⊑-trans i i') ≈̇ -D-mapᵒ i ∘' -D-mapᵒ i'
   -D-mapᵒ-pres-trans i i' = ≈̇-trans (◇-map-pres-≈̇ (-⊇-mapᵒ-pres-trans i i')) (◇-map-pres-∘ (-⊇-mapᵒ i) (-⊇-mapᵒ i'))
 
 -- observe:
@@ -80,13 +80,13 @@ _ = triple
   }
   where
     opaque
-      wk-pres-≋ : (i : w ⊆ v) {x y : Hom (-D w) 𝒫} → x ≈̇ y → x ∘' -D-mapᵒ i ≈̇ y ∘' -D-mapᵒ i
+      wk-pres-≋ : (i : w ⊑ v) {x y : Hom (-D w) 𝒫} → x ≈̇ y → x ∘' -D-mapᵒ i ≈̇ y ∘' -D-mapᵒ i
       wk-pres-≋ i x≋y = ∘'-pres-≈̇-left x≋y (-D-mapᵒ i)
 
-      wk-pres-refl : (f : Hom (-D w) 𝒫) → f ∘' -D-mapᵒ ⊆-refl ≈̇ f
+      wk-pres-refl : (f : Hom (-D w) 𝒫) → f ∘' -D-mapᵒ ⊑-refl ≈̇ f
       wk-pres-refl f = ≈̇-trans (∘'-pres-≈̇-right f -D-mapᵒ-pres-refl) (∘'-unit-right _ f)
 
-      wk-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') (f : Hom (-D w) 𝒫) → f ∘' -D-mapᵒ (⊆-trans i i') ≈̇ (f ∘' -D-mapᵒ i) ∘' -D-mapᵒ i'
+      wk-pres-trans : (i : w ⊑ w') (i' : w' ⊑ w'') (f : Hom (-D w) 𝒫) → f ∘' -D-mapᵒ (⊑-trans i i') ≈̇ (f ∘' -D-mapᵒ i) ∘' -D-mapᵒ i'
       wk-pres-trans i i' f = ≈̇-trans (∘'-pres-≈̇-right f (-D-mapᵒ-pres-trans i i')) (≈̇-sym (∘'-assoc f (-D-mapᵒ i) (-D-mapᵒ i')) )
 
 -- made opaque to speedup type-checking and relying on implementation details
@@ -168,7 +168,7 @@ opaque
       ϵ-natural : Natural (◇ (◼ 𝒫)) 𝒫 ϵ-fun
       ϵ-natural i (elem (v , r , f)) = ≋[ 𝒫 ]-trans
         (f .natural i (elem (R-to-D r)))
-        (f .apply-≋ (proof (-, ≡-refl , ⊆-trans-unit _)))
+        (f .apply-≋ (proof (-, ≡-refl , ⊑-trans-unit _)))
 
 opaque
   unfolding ◼-map_ ◇-map_
@@ -188,7 +188,7 @@ opaque
 
   zig-zag₂ : ◼-map ϵ[ 𝒫 ] ∘' η[ ◼ 𝒫 ] ≈̇ id'[ ◼ 𝒫 ]
   zig-zag₂ {𝒫} = proof-≈̇ λ bp → proof-≈̇ λ d
-    → bp .apply-≋ (proof (≡-refl , ≡-refl , ⊆-trans-unit-right _))
+    → bp .apply-≋ (proof (≡-refl , ≡-refl , ⊑-trans-unit-right _))
 
 --
 -- Hom-set based characterisation of the adjunction

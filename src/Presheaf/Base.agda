@@ -8,8 +8,8 @@ open import Relation.Binary.PropositionalEquality
 
 module Presheaf.Base
   {W    : Set}
-  {_⊆_  : (w w' : W) → Set}
-  (IF   : IFrame W _⊆_)
+  {_⊑_  : (w w' : W) → Set}
+  (IF   : IFrame W _⊑_)
   where
 
 open IFrame IF
@@ -36,12 +36,12 @@ record Psh : Set₁ where
     ≋-equiv   : ∀ (w : W) → IsEquivalence {A = Fam w} _≋_
 
     -- setoid morphisms
-    wk        : (i : w ⊆ v) → (x : Fam w) → Fam v
-    wk-pres-≋ : ∀ (i : w ⊆ v) {x y : Fam w} (x≋y : x ≋ y) → wk i x ≋ wk i y
+    wk        : (i : w ⊑ v) → (x : Fam w) → Fam v
+    wk-pres-≋ : ∀ (i : w ⊑ v) {x y : Fam w} (x≋y : x ≋ y) → wk i x ≋ wk i y
 
     -- functoriality
-    wk-pres-refl  : ∀ (x : Fam w) → wk ⊆-refl x ≋ x
-    wk-pres-trans : ∀ (i : w ⊆ w') (i' : w' ⊆ w'') (x : Fam w) → wk (⊆-trans i i') x ≋ wk i' (wk i x)
+    wk-pres-refl  : ∀ (x : Fam w) → wk ⊑-refl x ≋ x
+    wk-pres-trans : ∀ (i : w ⊑ w') (i' : w' ⊑ w'') (x : Fam w) → wk (⊑-trans i i') x ≋ wk i' (wk i x)
 
   infix 19 Fam
 
@@ -52,7 +52,7 @@ record Psh : Set₁ where
     ; isEquivalence = ≋-equiv w
     }
 
-  wk-pres-≡-≋ : ∀ {i i' : w ⊆ v} (i≡i' : i ≡ i') {x y : Fam w} (x≋y : x ≋ y) → wk i x ≋ wk i' y
+  wk-pres-≡-≋ : ∀ {i i' : w ⊑ v} (i≡i' : i ≡ i') {x y : Fam w} (x≋y : x ≋ y) → wk i x ≋ wk i' y
   wk-pres-≡-≋ {i = i} {.i} ≡-refl = wk-pres-≋ i
 
   module _ {w : W} where
@@ -105,7 +105,7 @@ Pres-≋ : (𝒫 𝒬 : Psh) → ({w : W} → 𝒫 ₀ w → 𝒬 ₀ w) → Set
 Pres-≋ 𝒫 𝒬 f = {w : W} {p p' : 𝒫 ₀ w} (p≋p' : p ≋[ 𝒫 ] p') → f p ≋[ 𝒬 ] f p'
 
 Natural : (𝒫 𝒬 : Psh) → ({w : W} → 𝒫 ₀ w → 𝒬 ₀ w) → Set
-Natural 𝒫 𝒬 f = {w v : W} (i : w ⊆ v) (p : 𝒫 ₀ w) → wk[ 𝒬 ] i (f p) ≋[ 𝒬 ] f (wk[ 𝒫 ] i p)
+Natural 𝒫 𝒬 f = {w v : W} (i : w ⊑ v) (p : 𝒫 ₀ w) → wk[ 𝒬 ] i (f p) ≋[ 𝒬 ] f (wk[ 𝒫 ] i p)
 
 record _→̇_ (𝒫 𝒬 : Psh) : Set where -- type \-> \^.
   no-eta-equality

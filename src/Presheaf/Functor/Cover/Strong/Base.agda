@@ -5,8 +5,8 @@ import Frame.CFrame as CF
 
 module Presheaf.Functor.Cover.Strong.Base
   {W    : Set}
-  {_⊆_  : (w w' : W) → Set}
-  (IF   : IFrame W _⊆_)
+  {_⊑_  : (w w' : W) → Set}
+  (IF   : IFrame W _⊑_)
   (let open CF IF)
   (K   : W → Set)
   (_∈_ : (v : W) {w : W} → K w → Set)
@@ -55,7 +55,7 @@ strength[ 𝒫 , 𝒬 ] = record
     strength-fun-pres-≋ p≋p' (proof ≡-refl f≋f')
       = proof ≡-refl λ { ≅-refl → proof (wk[ 𝒫 ]-pres-≋ _ p≋p' , f≋f' ≅-refl) }
 
-    strength-fun-natural : (i : w ⊆ w') (x : 𝒫 ₀ w) (q : 𝒞-Fam 𝒬 w)
+    strength-fun-natural : (i : w ⊑ w') (x : 𝒫 ₀ w) (q : 𝒞-Fam 𝒬 w)
       →  wk[ 𝒞 (𝒫 ×' 𝒬) ] i (strength-fun x q) ≋[ 𝒞 (𝒫 ×' 𝒬) ] strength-fun (wk[ 𝒫 ] i x) (wk[ 𝒞 𝒬 ] i q)
     strength-fun-natural i x (elem k f) = proof ≡-refl (λ { {u} {p} ≅-refl → proof
       ((let (k' , is')    = refine i k
@@ -63,9 +63,9 @@ strength[ 𝒫 , 𝒬 ] = record
             open EqReasoning ≋[ 𝒫 ]-setoid in begin
           wk[ 𝒫 ] i' (wk[ 𝒫 ] (cfamily k p') x)
             ≈˘⟨ wk[ 𝒫 ]-pres-trans (cfamily k p') i' x ⟩
-          wk[ 𝒫 ] (⊆-trans (cfamily k p') i') x
+          wk[ 𝒫 ] (⊑-trans (cfamily k p') i') x
             ≡⟨ ≡-cong (λ w → wk[ 𝒫 ] w x) (family-stable i k p) ⟩
-          wk[ 𝒫 ] (⊆-trans i (cfamily k' p)) x
+          wk[ 𝒫 ] (⊑-trans i (cfamily k' p)) x
             ≈⟨ wk[ 𝒫 ]-pres-trans i (cfamily k' p) x ⟩
           wk[ 𝒫 ] (cfamily k' p) (wk[ 𝒫 ] i x)
         ∎)

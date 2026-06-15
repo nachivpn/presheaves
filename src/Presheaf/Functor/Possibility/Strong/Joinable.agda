@@ -4,8 +4,8 @@ import Frame.FDFrame as FDF
 
 module Presheaf.Functor.Possibility.Strong.Joinable
   {W   : Set}
-  {_⊆_ : (w w' : W) → Set}
-  {IF  : IFrame W _⊆_}
+  {_⊑_ : (w w' : W) → Set}
+  {IF  : IFrame W _⊑_}
   {_R_ : (w v : W) → Set}
   (let open FDF IF _R_)
   (DF  : DFrame)
@@ -43,13 +43,13 @@ module InclusiveJoinable (TDF : JoinableDFrame) (ITDF : InclusiveJoinableDFrame 
     
     ◇-strong-join : join[ 𝒫 ×' 𝒬 ] ∘' (◇-map strength[ 𝒫 , 𝒬 ]) ∘' strength[ 𝒫 , ◇ 𝒬 ] ≈̇ strength[ 𝒫 , 𝒬 ] ∘' (id'[ 𝒫 ] ×'-map join[ 𝒬 ])
     ◇-strong-join {𝒫} {𝒬} = proof-≈̇ (λ x → proof (≡-refl , ≡-refl , proof ((let open EqReasoning ≋[ 𝒫 ]-setoid in begin
-      wk[ 𝒫 ] (wit⊆ (R-join _ _)) (wk[ 𝒫 ] (R-to-⊆ _) (wk[ 𝒫 ] (R-to-⊆ _) (π₁' .apply x)))
-        ≈˘⟨ wk[ 𝒫 ]-pres-≋ (wit⊆ (R-join _ _)) (wk[ 𝒫 ]-pres-trans _ _ _) ⟩
-      wk[ 𝒫 ] (wit⊆ (R-join _ _)) (wk[ 𝒫 ] (⊆-trans (R-to-⊆ _) (R-to-⊆ _)) (π₁' .apply x))
+      wk[ 𝒫 ] (wit⊑ (R-join _ _)) (wk[ 𝒫 ] (R-to-⊑ _) (wk[ 𝒫 ] (R-to-⊑ _) (π₁' .apply x)))
+        ≈˘⟨ wk[ 𝒫 ]-pres-≋ (wit⊑ (R-join _ _)) (wk[ 𝒫 ]-pres-trans _ _ _) ⟩
+      wk[ 𝒫 ] (wit⊑ (R-join _ _)) (wk[ 𝒫 ] (⊑-trans (R-to-⊑ _) (R-to-⊑ _)) (π₁' .apply x))
         ≈˘⟨ wk[ 𝒫 ]-pres-trans _ _ _  ⟩
-      wk[ 𝒫 ] (⊆-trans (⊆-trans (R-to-⊆ _) (R-to-⊆ _)) (wit⊆ (R-join _ _))) (π₁' .apply x)
-        ≡˘⟨ cong (λ z → wk[ 𝒫 ] z (π₁' .apply x)) (R-to-⊆-pres-join _ _)  ⟩
-      wk[ 𝒫 ] (R-to-⊆ (witR (R-join _ _))) (π₁' .apply x)
+      wk[ 𝒫 ] (⊑-trans (⊑-trans (R-to-⊑ _) (R-to-⊑ _)) (wit⊑ (R-join _ _))) (π₁' .apply x)
+        ≡˘⟨ cong (λ z → wk[ 𝒫 ] z (π₁' .apply x)) (R-to-⊑-pres-join _ _)  ⟩
+      wk[ 𝒫 ] (R-to-⊑ (witR (R-join _ _))) (π₁' .apply x)
         ∎)
       , ≋[ 𝒬 ]-refl)))
 
@@ -69,9 +69,9 @@ module InclusiveTransitive (TDF : TransitiveDFrame) (ITDF : InclusiveTransitiveD
       , ≡-refl
       , proof
         ((let open EqReasoning ≋[ 𝒫 ]-setoid in begin
-          wk[ 𝒫 ] (R-to-⊆ _) (wk[ 𝒫 ] (R-to-⊆ _) (π₁' .apply x))
+          wk[ 𝒫 ] (R-to-⊑ _) (wk[ 𝒫 ] (R-to-⊑ _) (π₁' .apply x))
             ≈˘⟨ wk[ 𝒫 ]-pres-trans _ _ _ ⟩
-          wk[ 𝒫 ] (⊆-trans (R-to-⊆ _) (R-to-⊆ _)) (π₁' .apply x)
-            ≡˘⟨ cong (λ z → wk[ 𝒫 ] z (π₁' .apply x)) (R-to-⊆-pres-trans _ _) ⟩
-          wk[ 𝒫 ] (R-to-⊆ (R-trans _ _)) (π₁' .apply x) ∎)
+          wk[ 𝒫 ] (⊑-trans (R-to-⊑ _) (R-to-⊑ _)) (π₁' .apply x)
+            ≡˘⟨ cong (λ z → wk[ 𝒫 ] z (π₁' .apply x)) (R-to-⊑-pres-trans _ _) ⟩
+          wk[ 𝒫 ] (R-to-⊑ (R-trans _ _)) (π₁' .apply x) ∎)
         , ≋[ 𝒬 ]-refl))))

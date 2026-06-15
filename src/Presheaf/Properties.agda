@@ -4,8 +4,8 @@ open import Frame.IFrame
 
 module Presheaf.Properties
   {W    : Set}
-  {_⊆_  : (w w' : W) → Set}
-  (IF   : IFrame W _⊆_)
+  {_⊑_  : (w w' : W) → Set}
+  (IF   : IFrame W _⊑_)
   where
 
 open import Presheaf.Base IF
@@ -30,47 +30,47 @@ private
 
 -⊇_ : W → Psh
 -⊇ w = record
-  { Fam           = w ⊆_
+  { Fam           = w ⊑_
   ; _≋_           = _≡_
   ; ≋-equiv       = λ _ → ≡-equiv
-  ; wk            = λ i i' → ⊆-trans i' i
+  ; wk            = λ i i' → ⊑-trans i' i
   ; wk-pres-≋     = wk-pres-≋
   ; wk-pres-refl  = wk-pres-refl
   ; wk-pres-trans = wk-pres-trans
   }
   where
     opaque
-      wk-pres-≋ : {w w' v : W} (i' : w' ⊆ v) {i1 i2 : w ⊆ w'} → i1 ≡ i2 → ⊆-trans i1 i' ≡ ⊆-trans i2 i'
-      wk-pres-≋ i x≋y = cong₂ ⊆-trans x≋y ≡-refl
+      wk-pres-≋ : {w w' v : W} (i' : w' ⊑ v) {i1 i2 : w ⊑ w'} → i1 ≡ i2 → ⊑-trans i1 i' ≡ ⊑-trans i2 i'
+      wk-pres-≋ i x≋y = cong₂ ⊑-trans x≋y ≡-refl
 
-      wk-pres-refl : {w w' : W} (i : w ⊆ w') → ⊆-trans i ⊆-refl ≡ i
-      wk-pres-refl = ⊆-trans-unit-right
+      wk-pres-refl : {w w' : W} (i : w ⊑ w') → ⊑-trans i ⊑-refl ≡ i
+      wk-pres-refl = ⊑-trans-unit-right
 
-      wk-pres-trans : (i : w' ⊆ v) (i' : v ⊆ v') (x : w ⊆ w') → ⊆-trans x (⊆-trans i i') ≡ ⊆-trans (⊆-trans x i) i'
-      wk-pres-trans i' i'' i = ≡-sym (⊆-trans-assoc i i' i'')
+      wk-pres-trans : (i : w' ⊑ v) (i' : v ⊑ v') (x : w ⊑ w') → ⊑-trans x (⊑-trans i i') ≡ ⊑-trans (⊑-trans x i) i'
+      wk-pres-trans i' i'' i = ≡-sym (⊑-trans-assoc i i' i'')
 
 -- deliberately not opaque (causes too many unfoldings, especially at higher levels of abstraction)
 -- seems harmless on type-checking performance
--⊇-mapᵒ_ : w ⊆ w' → -⊇ w' →̇ -⊇ w
+-⊇-mapᵒ_ : w ⊑ w' → -⊇ w' →̇ -⊇ w
 -⊇-mapᵒ_ {w} {w'} i = record
-  { fun     = ⊆-trans i
+  { fun     = ⊑-trans i
   ; pres-≋  = -⊇-mapᵒ-pres-≋
   ; natural = -⊇-mapᵒ-natural
   }
   where
     opaque
-      -⊇-mapᵒ-pres-≋ : Pres-≋ (-⊇ w') (-⊇ w) (⊆-trans i)
-      -⊇-mapᵒ-pres-≋ = cong (⊆-trans i)
+      -⊇-mapᵒ-pres-≋ : Pres-≋ (-⊇ w') (-⊇ w) (⊑-trans i)
+      -⊇-mapᵒ-pres-≋ = cong (⊑-trans i)
 
-      -⊇-mapᵒ-natural : Natural (-⊇ w') (-⊇ w) (⊆-trans i)
-      -⊇-mapᵒ-natural i' i'' = ⊆-trans-assoc i i'' i'
+      -⊇-mapᵒ-natural : Natural (-⊇ w') (-⊇ w) (⊑-trans i)
+      -⊇-mapᵒ-natural i' i'' = ⊑-trans-assoc i i'' i'
 
 opaque
-  -⊇-mapᵒ-pres-refl : -⊇-mapᵒ ⊆-refl[ w ] ≈̇ id'
-  -⊇-mapᵒ-pres-refl = proof-≈̇ ⊆-trans-unit-left
+  -⊇-mapᵒ-pres-refl : -⊇-mapᵒ ⊑-refl[ w ] ≈̇ id'
+  -⊇-mapᵒ-pres-refl = proof-≈̇ ⊑-trans-unit-left
 
-  -⊇-mapᵒ-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') → -⊇-mapᵒ (⊆-trans i i') ≈̇ -⊇-mapᵒ i ∘' -⊇-mapᵒ i'
-  -⊇-mapᵒ-pres-trans i i' = proof-≈̇ (⊆-trans-assoc i i')
+  -⊇-mapᵒ-pres-trans : (i : w ⊑ w') (i' : w' ⊑ w'') → -⊇-mapᵒ (⊑-trans i i') ≈̇ -⊇-mapᵒ i ∘' -⊇-mapᵒ i'
+  -⊇-mapᵒ-pres-trans i i' = proof-≈̇ (⊑-trans-assoc i i')
 
 --
 -- The comonad ◻ᵢ
@@ -89,13 +89,13 @@ opaque
   }
   where
     opaque
-      wk-pres-≋ : (i : w ⊆ v) {f g : Hom (-⊇ w) 𝒫} → f ≈̇ g → f ∘' -⊇-mapᵒ i ≈̇ g ∘' -⊇-mapᵒ i
+      wk-pres-≋ : (i : w ⊑ v) {f g : Hom (-⊇ w) 𝒫} → f ≈̇ g → f ∘' -⊇-mapᵒ i ≈̇ g ∘' -⊇-mapᵒ i
       wk-pres-≋ i x≋y = ∘'-pres-≈̇-left x≋y (-⊇-mapᵒ i)
 
-      wk-pres-refl : (f : Hom (-⊇ w) 𝒫) → f ∘' -⊇-mapᵒ ⊆-refl ≈̇ f
+      wk-pres-refl : (f : Hom (-⊇ w) 𝒫) → f ∘' -⊇-mapᵒ ⊑-refl ≈̇ f
       wk-pres-refl f = ≈̇-trans (∘'-pres-≈̇-right f -⊇-mapᵒ-pres-refl) (∘'-unit-right _ f)
 
-      wk-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') (f : Hom (-⊇ w) 𝒫) → f ∘' -⊇-mapᵒ (⊆-trans i i') ≈̇ (f ∘' -⊇-mapᵒ i) ∘' -⊇-mapᵒ i'
+      wk-pres-trans : (i : w ⊑ w') (i' : w' ⊑ w'') (f : Hom (-⊇ w) 𝒫) → f ∘' -⊇-mapᵒ (⊑-trans i i') ≈̇ (f ∘' -⊇-mapᵒ i) ∘' -⊇-mapᵒ i'
       wk-pres-trans i i' f = ≈̇-trans (∘'-pres-≈̇-right f (-⊇-mapᵒ-pres-trans i i')) (≈̇-sym (∘'-assoc f (-⊇-mapᵒ i) (-⊇-mapᵒ i')) )
 
 
@@ -153,7 +153,7 @@ copointᵢ[ 𝒫 ] = record
   }
   where
     copoint-fun : (◻ᵢ 𝒫) ₀ w → 𝒫 ₀ w
-    copoint-fun = λ f → f .apply ⊆-refl
+    copoint-fun = λ f → f .apply ⊑-refl
 
     opaque
 
@@ -161,6 +161,6 @@ copointᵢ[ 𝒫 ] = record
       copoint-pres-≋ {_} {f} {f'} = λ f≋f' → apply-≈̇' f≋f' ≡-refl
 
       copoint-natural :  Natural (◻ᵢ 𝒫) 𝒫 (copoint-fun)
-      copoint-natural i f = ≋[ 𝒫 ]-trans (f .natural i ⊆-refl) (f .apply-≋ (⊆-trans-unit i))
+      copoint-natural i f = ≋[ 𝒫 ]-trans (f .natural i ⊑-refl) (f .apply-≋ (⊑-trans-unit i))
 
 -- TODO: cojoinᵢ[_]

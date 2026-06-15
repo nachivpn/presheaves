@@ -5,8 +5,8 @@ import Frame.FDFrame as FDF
 
 module Presheaf.Functor.Possibility.Strong.Base
   {W   : Set}
-  {_⊆_ : (w w' : W) → Set}
-  {IF  : IFrame W _⊆_}
+  {_⊑_ : (w w' : W) → Set}
+  {IF  : IFrame W _⊑_}
   {_R_ : (w v : W) → Set}
   (let open FDF IF _R_)
   {DF  : DFrame}
@@ -40,7 +40,7 @@ strength[ 𝒫 , 𝒬 ] = record
   where
 
   strength-fun : 𝒫 ₀ w → ◇-Fam 𝒬 w → ◇-Fam (𝒫 ×' 𝒬) w
-  strength-fun p (elem (Δ , r , q)) = elem (Δ , r , elem (wk[ 𝒫 ] (R-to-⊆ r) p , q))
+  strength-fun p (elem (Δ , r , q)) = elem (Δ , r , elem (wk[ 𝒫 ] (R-to-⊑ r) p , q))
 
   opaque
     strength-fun-pres-≋ : {p p' : 𝒫 ₀ w'} {q q' : ◇-Fam 𝒬 w'}
@@ -48,18 +48,18 @@ strength[ 𝒫 , 𝒬 ] = record
         → (strength-fun p q) ◇-≋[ 𝒫 ×' 𝒬 ] (strength-fun p' q')
     strength-fun-pres-≋ p≋p' (proof (refl , refl , q≋q')) = proof (refl , refl , proof (wk[ 𝒫 ]-pres-≋ _ p≋p' , q≋q'))
 
-    strength-fun-natural : (i : w ⊆ w') (p : 𝒫 ₀ w) (q : ◇-Fam 𝒬 w)
+    strength-fun-natural : (i : w ⊑ w') (p : 𝒫 ₀ w) (q : ◇-Fam 𝒬 w)
       →  wk[ ◇ (𝒫 ×' 𝒬) ] i (strength-fun p q) ≋[ ◇ (𝒫 ×' 𝒬) ] strength-fun (wk[ 𝒫 ] i p) (wk[ ◇ 𝒬 ] i q)
     strength-fun-natural w p q = let open EqReasoning ≋[ 𝒫 ]-setoid in
       proof (refl , (refl , (proof
         ((begin
-          wk[ 𝒫 ] (factor⊆ w _) (wk[ 𝒫 ] (R-to-⊆ _) p)
-            ≈˘⟨ wk[ 𝒫 ]-pres-trans (R-to-⊆ _) (factor⊆ w _) p ⟩
-          wk[ 𝒫 ] (⊆-trans (R-to-⊆ _) (factor⊆ w _)) p
-            ≡˘⟨ cong (λ w → wk[ 𝒫 ] w p) (factor-pres-R-to-⊆ w _) ⟩
-          wk[ 𝒫 ] (⊆-trans w (R-to-⊆ (factorR w _))) p
-            ≈⟨  wk[ 𝒫 ]-pres-trans w (R-to-⊆ (factorR w _)) p ⟩
-          wk[ 𝒫 ] (R-to-⊆ (factorR w _)) (wk[ 𝒫 ] w p)
+          wk[ 𝒫 ] (factor⊑ w _) (wk[ 𝒫 ] (R-to-⊑ _) p)
+            ≈˘⟨ wk[ 𝒫 ]-pres-trans (R-to-⊑ _) (factor⊑ w _) p ⟩
+          wk[ 𝒫 ] (⊑-trans (R-to-⊑ _) (factor⊑ w _)) p
+            ≡˘⟨ cong (λ w → wk[ 𝒫 ] w p) (factor-pres-R-to-⊑ w _) ⟩
+          wk[ 𝒫 ] (⊑-trans w (R-to-⊑ (factorR w _))) p
+            ≈⟨  wk[ 𝒫 ]-pres-trans w (R-to-⊑ (factorR w _)) p ⟩
+          wk[ 𝒫 ] (R-to-⊑ (factorR w _)) (wk[ 𝒫 ] w p)
            ∎)
         , ≋[ 𝒬 ]-refl))))
 

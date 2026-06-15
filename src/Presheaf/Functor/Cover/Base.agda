@@ -8,8 +8,8 @@ import Relation.Binary.Reasoning.Setoid as EqReasoning
 
 module Presheaf.Functor.Cover.Base
   {W    : Set}
-  {_⊆_  : (w w' : W) → Set}
-  (IF   : IFrame W _⊆_)
+  {_⊑_  : (w w' : W) → Set}
+  (IF   : IFrame W _⊑_)
   (let open CF IF)
   {K    : W → Set}
   {_∈_ : (v : W) {w : W} → K w → Set}
@@ -142,18 +142,18 @@ wkElFam-pres-≋ {𝒫 = 𝒫} (≡-refl , ref≋) el≋el' {v} {p} {.p} ≅-ref
      ; trans = 𝒞-≋-trans
      }
 
-   wk-𝒞 : w ⊆ w' → 𝒞-Fam 𝒫 w → 𝒞-Fam 𝒫 w'
+   wk-𝒞 : w ⊑ w' → 𝒞-Fam 𝒫 w → 𝒞-Fam 𝒫 w'
    wk-𝒞 i cp = 𝒞-kmap (refine i) cp
 
    opaque
-     wk-𝒞-pres-≋ : (i : w ⊆ w') {x y : 𝒞-Fam 𝒫 w} → x 𝒞-≋ y → wk-𝒞 i x 𝒞-≋ wk-𝒞 i y
+     wk-𝒞-pres-≋ : (i : w ⊑ w') {x y : 𝒞-Fam 𝒫 w} → x 𝒞-≋ y → wk-𝒞 i x 𝒞-≋ wk-𝒞 i y
      wk-𝒞-pres-≋ i p = 𝒞-kmap-pres-≋-right (refine i) p
 
-     wk-𝒞-pres-refl : (x : 𝒞-Fam 𝒫 w) → wk-𝒞 ⊆-refl x 𝒞-≋ x
+     wk-𝒞-pres-refl : (x : 𝒞-Fam 𝒫 w) → wk-𝒞 ⊑-refl x 𝒞-≋ x
      wk-𝒞-pres-refl x = 𝒞-≋-trans (𝒞-kmap-pres-≋-left refine-pres-⇒≼-refl x) (𝒞-kmap-pres-refl x)
 
-     wk-𝒞-pres-trans : (i : w ⊆ w') (i' : w' ⊆ w'') (x : 𝒞-Fam 𝒫 w)
-       → wk-𝒞 (⊆-trans i i') x 𝒞-≋ wk-𝒞 i' (wk-𝒞 i x)
+     wk-𝒞-pres-trans : (i : w ⊑ w') (i' : w' ⊑ w'') (x : 𝒞-Fam 𝒫 w)
+       → wk-𝒞 (⊑-trans i i') x 𝒞-≋ wk-𝒞 i' (wk-𝒞 i x)
      wk-𝒞-pres-trans i i' x = 𝒞-≋-trans (𝒞-kmap-pres-≋-left (refine-pres-⇒≼-trans i i') x) (𝒞-kmap-pres-trans (refine i) (refine i') x)
 
 ---------------------------

@@ -3,5 +3,6 @@ depend:
   -- agda-2.8
   standard-library-2.4
   frames -- https://github.com/nachivpn/frames
+  agda-categories
 include :
   src

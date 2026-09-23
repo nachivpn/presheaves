@@ -4,6 +4,7 @@ open import Function using () renaming (id to idᶠ ; _∘_ to _∘ᶠ_) public
 
 open import Level using (0ℓ ; suc)
 open import Categories.Category
+  hiding (_[_,_])
   renaming (Category to LCategory) public
 
 open import Data.Product using (_×_ ; proj₁ ; proj₂) public

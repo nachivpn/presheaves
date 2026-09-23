@@ -2,7 +2,8 @@ open import Algebra.Lib
 
 module Algebra.Category (𝒞 : Category) (T : Monad 𝒞) where
 
-open import Categories.Category.Construction.EilenbergMoore T renaming (Module to Algebra)
+open import Categories.Category.Construction.EilenbergMoore T
+  renaming (Module to Algebra ; Module⇒ to AlgebraHom)
 
 module 𝒞 = Category 𝒞
 open 𝒞
@@ -11,8 +12,11 @@ module ≈ = Equiv {- in 𝒞 -}
 module T = Monad T
 open T.F renaming (F₀ to T₀ ; F₁ to T₁ ; F-resp-≈ to T₁-resp-≈)
 
+infix  4 _≈̃_ _⇒̃_
+infixr 9 _∘̃_
+
 -- plain maps on monad algebras/modules
-record _⇒̃ᵀ_ (X Y : Algebra) : Set where
+record _⇒̃_ (X Y : Algebra) : Set where
   constructor plain
   private
     module X = Algebra X
@@ -20,15 +24,26 @@ record _⇒̃ᵀ_ (X Y : Algebra) : Set where
   field
     arr     : X.A 𝒞.⇒ Y.A
 
-open _⇒̃ᵀ_
+open _⇒̃_
 
-𝒞̃ᵀ : Category
-𝒞̃ᵀ = record
+id∼ : {X : Algebra} → X ⇒̃ X
+id∼ = plain 𝒞.id
+
+_∘̃_ : {X Y Z : Algebra} → Y ⇒̃ Z → X ⇒̃ Y → X ⇒̃ Z
+f ∘̃ g = plain (f .arr 𝒞.∘ g .arr)
+
+open _⇒̃_
+
+_≈̃_ : {X Y : Algebra} → (f g : X ⇒̃ Y) → Set
+f ≈̃ g  = arr f 𝒞.≈ arr g
+
+𝒞̃ : Category
+𝒞̃ = record
   { Obj       = Algebra
-  ; _⇒_       = _⇒̃ᵀ_
-  ; _≈_       = λ f g → arr f 𝒞.≈ arr g
-  ; id        = record { arr = 𝒞.id }
-  ; _∘_       = λ f g → plain (f .arr 𝒞.∘ g .arr)
+  ; _⇒_       = _⇒̃_
+  ; _≈_       = _≈̃_
+  ; id        = id∼
+  ; _∘_       = _∘̃_
   ; assoc     = 𝒞.assoc
   ; sym-assoc = 𝒞.sym-assoc
   ; identityˡ = 𝒞.identityˡ
@@ -42,7 +57,7 @@ open _⇒̃ᵀ_
   ; ∘-resp-≈  = 𝒞.∘-resp-≈
   }
 
-𝒥 : Functor 𝒞 𝒞̃ᵀ 
+𝒥 : Functor 𝒞 𝒞̃
 𝒥 = record
   { F₀         = λ X → record
     { A        = T₀ X
@@ -56,21 +71,30 @@ open _⇒̃ᵀ_
   ; F-resp-≈     = T₁-resp-≈
   }
 
-module 𝒥 = Functor 𝒥
-
-module Cartesian∼ᵀ (cartesianꟲ : Cartesian 𝒞) where
-
-  open import Categories.Object.Terminal
-  open import Categories.Category.BinaryProducts
+∣-∣ : Functor 𝒞̃ 𝒞 
+∣-∣ = let open Algebra in record
+  { F₀           = A
+  ; F₁           = arr
+  ; identity     = ≈.refl
+  ; homomorphism = ≈.refl
+  ; F-resp-≈     = idᶠ
+  }
   
-  open Cartesian cartesianꟲ
-    renaming (_×_ to _×ꟲ_ ; η to ×ᶜ-eta ; _×₁_ to _×-map_ ; ⊤ to ⊤ꟲ)
-
+module 𝒥 = Functor 𝒥
+private
   join  = T.μ.η
   point = T.η.η
 
-  ⊤̃ᵀ : Algebra
-  ⊤̃ᵀ = record
+module Cartesian∼ (cartesianꟲ : Cartesian 𝒞) where
+
+  open import Categories.Object.Terminal
+  open import Categories.Category.BinaryProducts
+
+  open Cartesian cartesianꟲ
+    renaming (_×_ to _×ꟲ_ ; η to ×ᶜ-eta ; _×₁_ to _×-map_ ; ⊤ to ⊤ꟲ)
+
+  ⊤̃ : Algebra
+  ⊤̃ = record
     { A        = ⊤ꟲ
     ; action   = !
     ; commute  = ≈.trans
@@ -80,10 +104,10 @@ module Cartesian∼ᵀ (cartesianꟲ : Cartesian 𝒞) where
         (≈.sym (!-unique (! ∘ point ⊤ꟲ)))
         (!-unique 𝒞.id)
     }
-  
-  terminal∼ᵀ : Terminal 𝒞̃ᵀ
-  terminal∼ᵀ = record
-    { ⊤             = ⊤̃ᵀ
+
+  terminal∼ : Terminal 𝒞̃
+  terminal∼ = record
+    { ⊤             = ⊤̃
     ; ⊤-is-terminal = record
       { !        = plain !
       ; !-unique = !-unique ∘ᶠ arr
@@ -96,9 +120,9 @@ module Cartesian∼ᵀ (cartesianꟲ : Cartesian 𝒞) where
       module Y = Algebra Y
       ∣X∣ = X.A
       ∣Y∣ = Y.A
-    
-    _×̃ᵀ_ : Algebra
-    _×̃ᵀ_ = record 
+
+    _×̃_ : Algebra
+    _×̃_ = record
       { A        = ∣X∣ ×ꟲ ∣Y∣
       ; action   = ⟨ X.action ∘ T₁ π₁ , Y.action ∘ T₁ π₂ ⟩
       ; commute  = let open 𝒞.HomReasoning in begin
@@ -112,12 +136,12 @@ module Cartesian∼ᵀ (cartesianꟲ : Cartesian 𝒞) where
         , Y.action ∘ T₁ (π₂ ∘ ⟨ X.action ∘ T₁ π₁ , Y.action ∘ T₁ π₂ ⟩) ⟩
           -- underlying product structure
           ≈⟨ ⟨⟩-cong₂ (∘-resp-≈ʳ (T₁-resp-≈ project₁)) (∘-resp-≈ʳ (T₁-resp-≈ project₂)) ⟩
-        ⟨ X.action ∘ T₁ (X.action ∘ T₁ π₁) , Y.action ∘ T₁ (Y.action ∘ T₁ π₂) ⟩ 
+        ⟨ X.action ∘ T₁ (X.action ∘ T₁ π₁) , Y.action ∘ T₁ (Y.action ∘ T₁ π₂) ⟩
           ≈⟨ ⟨⟩-cong₂ (∘-resp-≈ʳ homomorphism) (∘-resp-≈ʳ homomorphism) ⟩
-        ⟨ X.action ∘ T₁ X.action ∘ T₁ (T₁ π₁) , Y.action ∘ T₁ Y.action ∘ T₁ (T₁ π₂) ⟩ 
-          ≈˘⟨ ⟨⟩-cong₂ assoc assoc ⟩
+        ⟨ X.action ∘ T₁ X.action ∘ T₁ (T₁ π₁) , Y.action ∘ T₁ Y.action ∘ T₁ (T₁ π₂) ⟩
+          ≈⟨ ⟨⟩-cong₂ sym-assoc sym-assoc ⟩
         ⟨ (X.action ∘ T₁ X.action) ∘ T₁ (T₁ π₁) , (Y.action ∘ T₁ Y.action) ∘ T₁ (T₁ π₂) ⟩
-          -- `commute` ("action property") of the underlying algebras 
+          -- `commute` ("action property") of the underlying algebras
           ≈⟨ ⟨⟩-cong₂ (∘-resp-≈ˡ X.commute) (∘-resp-≈ˡ Y.commute) ⟩
         ⟨ (X.action ∘ join ∣X∣) ∘ T₁ (T₁ π₁) , (Y.action ∘ join ∣Y∣) ∘ T₁ (T₁ π₂) ⟩
           ≈⟨ ⟨⟩-cong₂ assoc assoc ⟩
@@ -141,7 +165,7 @@ module Cartesian∼ᵀ (cartesianꟲ : Cartesian 𝒞) where
         ⟨ (X.action ∘ point ∣X∣) ∘ π₁ , (Y.action ∘ point ∣Y∣) ∘ π₂ ⟩
           -- `identity` ("unit property") of the underlying algebras
           ≈⟨ ⟨⟩-cong₂ (∘-resp-≈ˡ X.identity) (∘-resp-≈ˡ Y.identity) ⟩
-        ⟨ 𝒞.id ∘ π₁ , 𝒞.id ∘ π₂ ⟩ 
+        ⟨ 𝒞.id ∘ π₁ , 𝒞.id ∘ π₂ ⟩
           ≈⟨ ⟨⟩-cong₂ identityˡ identityˡ ⟩
         ⟨ π₁ , π₂ ⟩
           -- underlying product structure
@@ -150,10 +174,10 @@ module Cartesian∼ᵀ (cartesianꟲ : Cartesian 𝒞) where
           ∎
       }
 
-  products∼ᵀ : BinaryProducts 𝒞̃ᵀ
-  products∼ᵀ = record
+  products∼ : BinaryProducts 𝒞̃
+  products∼ = record
     { product = λ {X} {Y} → record
-      { A×B      = X ×̃ᵀ Y
+      { A×B      = X ×̃ Y
       ; π₁       = plain π₁
       ; π₂       = plain π₂
       ; ⟨_,_⟩    = λ f g → plain ⟨ f .arr , g .arr ⟩
@@ -162,32 +186,135 @@ module Cartesian∼ᵀ (cartesianꟲ : Cartesian 𝒞) where
       ; unique   = unique
       }
     }
-  
-  cartesian∼ᵀ : Cartesian 𝒞̃ᵀ
-  cartesian∼ᵀ = record
-    { terminal = terminal∼ᵀ
-    ; products = products∼ᵀ
+
+  cartesian∼ : Cartesian 𝒞̃
+  cartesian∼ = record
+    { terminal = terminal∼
+    ; products = products∼
     }
-    
-module Cocartesian∼ᵀ (cocartesianꟲ : Cocartesian 𝒞) where
+
+module Cocartesian∼ (cocartesianꟲ : Cocartesian 𝒞) where
 
   open import Categories.Category.BinaryCoproducts public
   open import Categories.Object.Initial public
 
   open Cocartesian cocartesianꟲ
-    renaming (_+_ to _+ꟲ_ ; _+₁_ to _+-map_ ; ⊥ to ⊥ꟲ)
+    renaming (_+_ to _+ꟲ_ ; _+₁_ to _+-map_ ; ⊥ to ⊥ꟲ ; ¡ to ¡ꟲ)
 
+  -- define +̃
   module _ (X Y : Algebra) where
+    private
+      module X = Algebra X ; ∣X∣ = X.A
+      module Y = Algebra Y ; ∣Y∣ = Y.A
+
+    _+̃_ : Algebra
+    _+̃_ = 𝒥.₀ (∣X∣ +ꟲ ∣Y∣)
+
+  ⊥̃ : Algebra
+  ⊥̃ = 𝒥.₀ ⊥ꟲ
+
+  module _ {X : Algebra} where
+    private
+      module X = Algebra X
+
+    ¡̃ : (⊥̃ ⇒̃ X)
+    ¡̃ = plain (X.action ∘ T₁ ¡ꟲ)
+
+  -- (weak) eta rule for the empty type
+  η̃₀ : id∼ {⊥̃} ≈̃ ¡̃ {⊥̃}
+  η̃₀ = let open 𝒞.HomReasoning in begin
+    𝒞.id {T₀ ⊥ꟲ}
+      -- unit law of monad (join ∘ T point ≈ id)
+      ≈˘⟨ T.identityˡ ⟩
+    join ⊥ꟲ ∘ T₁ (point ⊥ꟲ)
+      -- uniqueness of underlying initial obj.
+      ≈˘⟨ ∘-resp-≈ʳ (T₁-resp-≈ (¡-unique (point ⊥ꟲ))) ⟩
+    join ⊥ꟲ ∘ T₁ ¡ꟲ
+      ∎
+
+  module _ {X Y : Algebra} where
     private
       module X = Algebra X
       module Y = Algebra Y
-      ∣X∣ = X.A
-      ∣Y∣ = Y.A
-      
-    _+̃ᵀ_ : Algebra
-    _+̃ᵀ_ = 𝒥.₀ (∣X∣ +ꟲ ∣Y∣)
+      ∣X∣ = X.A ; ∣Y∣ = Y.A
 
-  ⊥̃ᵀ : Algebra
-  ⊥̃ᵀ = 𝒥.₀ ⊥ꟲ
+    ĩ₁ : X ⇒̃ X +̃ Y
+    ĩ₁ = plain (point (∣X∣ +ꟲ ∣Y∣) ∘ i₁)
 
-    
+    ĩ₂ : Y ⇒̃ X +̃ Y
+    ĩ₂ = plain (point (∣X∣ +ꟲ ∣Y∣) ∘ i₂)
+
+    module _ {Z : Algebra} where
+      private
+        module Z = Algebra Z ; ∣Z∣ = Z.A
+
+      [_,_]∼ : X ⇒̃ Z → Y ⇒̃ Z → X +̃ Y ⇒̃ Z
+      [ f , g ]∼ = plain (Z.action ∘ T₁ [ f .arr , g .arr ])
+
+    -- (weak) eta rule for sum types
+    η̃₊ :  id∼ {X +̃ Y} ≈̃ [ ĩ₁ , ĩ₂ ]∼
+    η̃₊ = let open 𝒞.HomReasoning in begin
+      𝒞.id {T₀ (∣X∣ +ꟲ ∣Y∣)}
+        -- unit law of the monad (join ∘ T point ≈ id)
+        -- obs. identical to η̃₀
+        ≈˘⟨ T.identityˡ ⟩
+      join _ ∘ T₁ (point (∣X∣ +ꟲ ∣Y∣))
+        -- uniqueness of underlying coproduct
+        ≈˘⟨ ∘-resp-≈ʳ (T₁-resp-≈ (+-unique Equiv.refl Equiv.refl)) ⟩
+      join _ ∘ T₁ [ point _ ∘ i₁ , point _ ∘ i₂ ]
+        ∎
+
+  -- permutation conversions
+  module _ {Z Z' : Algebra} (hHom : AlgebraHom Z Z') where
+
+    private
+      module Z = Algebra Z
+      module Z' = Algebra Z'
+      ∣Z∣ = Z.A ; ∣Z'∣ = Z'.A
+
+    open AlgebraHom hHom renaming (arr to ∣h∣ ; commute to ∣h∣-hom)
+
+    h : Z ⇒̃ Z'
+    h = plain ∣h∣
+
+    -- permutation conversions for the empty type
+    π̃₀ᴱ : h ∘̃ ¡̃ {Z} ≈̃ ¡̃ {Z'}
+    π̃₀ᴱ = let open 𝒞.HomReasoning in begin
+      ∣h∣ ∘ Z.action ∘ T₁ ¡ꟲ
+        ≈⟨ sym-assoc ⟩
+      (∣h∣ ∘ Z.action) ∘ T₁ ¡ꟲ
+        -- algebra homomorphism
+        ≈⟨ ∘-resp-≈ˡ ∣h∣-hom ⟩
+      (Z'.action ∘ T₁ ∣h∣) ∘ T₁ ¡ꟲ
+        ≈⟨ assoc ⟩
+      Z'.action ∘ T₁ ∣h∣ ∘ T₁ ¡ꟲ
+        ≈˘⟨ ∘-resp-≈ʳ homomorphism ⟩
+      Z'.action ∘ T₁ (∣h∣ ∘ ¡ꟲ)
+        -- uniqueness of initial obj.
+        ≈˘⟨ ∘-resp-≈ʳ (T₁-resp-≈ (¡-unique (∣h∣ ∘ ¡ꟲ))) ⟩
+      Z'.action ∘ T₁ ¡ꟲ
+        ∎
+
+    module _ {X Y : Algebra} (f : X ⇒̃ Z) (g : Y ⇒̃ Z) where
+      private
+        module X = Algebra X ; ∣X∣ = X.A
+        module Y = Algebra Y ; ∣Y∣ = Y.A
+        ∣f∣ = f .arr  ; ∣g∣ = g .arr
+
+      -- permutation conversions for sum types
+      π̃ᴱ₊ : h ∘̃ [ f , g ]∼ ≈̃ [ h ∘̃ f , h ∘̃ g ]∼
+      π̃ᴱ₊ = let open 𝒞.HomReasoning in begin
+        ∣h∣ ∘ Z.action ∘ T₁ [ ∣f∣ , ∣g∣ ]
+          ≈⟨ sym-assoc ⟩
+        (∣h∣ ∘ Z.action) ∘ T₁ [ ∣f∣ , ∣g∣ ]
+          -- algebra homomorphism
+          ≈⟨ ∘-resp-≈ˡ ∣h∣-hom ⟩
+        (Z'.action ∘ T₁ ∣h∣) ∘ T₁ [ ∣f∣ , ∣g∣ ]
+          ≈⟨ assoc ⟩
+        Z'.action ∘ T₁ ∣h∣ ∘ T₁ [ ∣f∣ , ∣g∣ ]
+          ≈˘⟨ ∘-resp-≈ʳ homomorphism ⟩
+        Z'.action ∘ T₁ (∣h∣ ∘ [ ∣f∣ , ∣g∣ ])
+          -- uniqueness of underlying coproduct
+          ≈⟨ ∘-resp-≈ʳ (T₁-resp-≈ ∘-distribˡ-[]) ⟩
+        Z'.action ∘ T₁ [ ∣h∣ ∘ ∣f∣ , ∣h∣ ∘ ∣g∣ ]
+          ∎

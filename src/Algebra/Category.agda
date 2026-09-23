@@ -71,7 +71,7 @@ f ≈̃ g  = arr f 𝒞.≈ arr g
   ; F-resp-≈     = T₁-resp-≈
   }
 
-∣-∣ : Functor 𝒞̃ 𝒞 
+∣-∣ : Functor 𝒞̃ 𝒞
 ∣-∣ = let open Algebra in record
   { F₀           = A
   ; F₁           = arr
@@ -79,29 +79,28 @@ f ≈̃ g  = arr f 𝒞.≈ arr g
   ; homomorphism = ≈.refl
   ; F-resp-≈     = idᶠ
   }
-  
+
 module 𝒥 = Functor 𝒥
 private
   join  = T.μ.η
   point = T.η.η
 
-module Cartesian∼ (cartesianꟲ : Cartesian 𝒞) where
+module Cartesian∼ (cartesian : Cartesian 𝒞) where
 
-  open import Categories.Object.Terminal
-  open import Categories.Category.BinaryProducts
+  open import Categories.Object.Terminal public
+  open import Categories.Category.BinaryProducts public
 
-  open Cartesian cartesianꟲ
-    renaming (_×_ to _×ꟲ_ ; η to ×ᶜ-eta ; _×₁_ to _×-map_ ; ⊤ to ⊤ꟲ)
+  open Cartesian cartesian renaming (η to ×-eta) public
 
   ⊤̃ : Algebra
   ⊤̃ = record
-    { A        = ⊤ꟲ
+    { A        = ⊤
     ; action   = !
     ; commute  = ≈.trans
           (≈.sym (!-unique (! ∘ T₁ !)))
-          (!-unique (! ∘ join ⊤ꟲ))
+          (!-unique (! ∘ join ⊤))
     ; identity = ≈.trans
-        (≈.sym (!-unique (! ∘ point ⊤ꟲ)))
+        (≈.sym (!-unique (! ∘ point ⊤)))
         (!-unique 𝒞.id)
     }
 
@@ -123,7 +122,7 @@ module Cartesian∼ (cartesianꟲ : Cartesian 𝒞) where
 
     _×̃_ : Algebra
     _×̃_ = record
-      { A        = ∣X∣ ×ꟲ ∣Y∣
+      { A        = ∣X∣ × ∣Y∣
       ; action   = ⟨ X.action ∘ T₁ π₁ , Y.action ∘ T₁ π₂ ⟩
       ; commute  = let open 𝒞.HomReasoning in begin
         ⟨ X.action ∘ T₁ π₁ , Y.action ∘ T₁ π₂ ⟩ ∘ T₁ ⟨ X.action ∘ T₁ π₁ , Y.action ∘ T₁ π₂ ⟩
@@ -148,16 +147,16 @@ module Cartesian∼ (cartesianꟲ : Cartesian 𝒞) where
         ⟨ X.action ∘ join ∣X∣ ∘ T₁ (T₁ π₁) , Y.action ∘ join ∣Y∣ ∘ T₁ (T₁ π₂) ⟩
           -- naturality of join
           ≈⟨ ⟨⟩-cong₂ (∘-resp-≈ʳ (T.μ.commute π₁)) (∘-resp-≈ʳ (T.μ.commute π₂)) ⟩
-        ⟨ X.action ∘ T₁ π₁ ∘ join (∣X∣ ×ꟲ ∣Y∣) , Y.action ∘ T₁ π₂ ∘ join (∣X∣ ×ꟲ ∣Y∣) ⟩
+        ⟨ X.action ∘ T₁ π₁ ∘ join (∣X∣ × ∣Y∣) , Y.action ∘ T₁ π₂ ∘ join (∣X∣ × ∣Y∣) ⟩
           -- underlying product structure
           ≈˘⟨ ≈.trans ∘-distribʳ-⟨⟩ (⟨⟩-cong₂ assoc assoc) ⟩
-        ⟨ X.action ∘ T₁ π₁ , Y.action ∘ T₁ π₂ ⟩ ∘ join (∣X∣ ×ꟲ ∣Y∣)
+        ⟨ X.action ∘ T₁ π₁ , Y.action ∘ T₁ π₂ ⟩ ∘ join (∣X∣ × ∣Y∣)
           ∎
       ; identity = let open 𝒞.HomReasoning in begin
-        ⟨ X.action ∘ T₁ π₁ , Y.action ∘ T₁ π₂ ⟩ ∘ point (∣X∣ ×ꟲ ∣Y∣)
+        ⟨ X.action ∘ T₁ π₁ , Y.action ∘ T₁ π₂ ⟩ ∘ point (∣X∣ × ∣Y∣)
           -- underlying product structure
           ≈⟨ ≈.trans ∘-distribʳ-⟨⟩ (⟨⟩-cong₂ 𝒞.assoc assoc) ⟩
-        ⟨ X.action ∘ T₁ π₁ ∘ point (∣X∣ ×ꟲ ∣Y∣) , Y.action ∘ T₁ π₂ ∘ point (∣X∣ ×ꟲ ∣Y∣) ⟩
+        ⟨ X.action ∘ T₁ π₁ ∘ point (∣X∣ × ∣Y∣) , Y.action ∘ T₁ π₂ ∘ point (∣X∣ × ∣Y∣) ⟩
           -- naturality of point
           ≈˘⟨ ⟨⟩-cong₂ (∘-resp-≈ʳ (T.η.commute π₁)) (∘-resp-≈ʳ (T.η.commute π₂)) ⟩
         ⟨ X.action ∘ point ∣X∣ ∘ π₁ , Y.action ∘ point ∣Y∣ ∘ π₂ ⟩
@@ -169,7 +168,7 @@ module Cartesian∼ (cartesianꟲ : Cartesian 𝒞) where
           ≈⟨ ⟨⟩-cong₂ identityˡ identityˡ ⟩
         ⟨ π₁ , π₂ ⟩
           -- underlying product structure
-          ≈⟨ ×ᶜ-eta ⟩
+          ≈⟨ ×-eta ⟩
         𝒞.id
           ∎
       }
@@ -193,13 +192,12 @@ module Cartesian∼ (cartesianꟲ : Cartesian 𝒞) where
     ; products = products∼
     }
 
-module Cocartesian∼ (cocartesianꟲ : Cocartesian 𝒞) where
+module ModeratelyCocartesian∼ (cocartesian : Cocartesian 𝒞) where
 
   open import Categories.Category.BinaryCoproducts public
   open import Categories.Object.Initial public
 
-  open Cocartesian cocartesianꟲ
-    renaming (_+_ to _+ꟲ_ ; _+₁_ to _+-map_ ; ⊥ to ⊥ꟲ ; ¡ to ¡ꟲ)
+  open Cocartesian cocartesian public
 
   -- define +̃
   module _ (X Y : Algebra) where
@@ -208,28 +206,28 @@ module Cocartesian∼ (cocartesianꟲ : Cocartesian 𝒞) where
       module Y = Algebra Y ; ∣Y∣ = Y.A
 
     _+̃_ : Algebra
-    _+̃_ = 𝒥.₀ (∣X∣ +ꟲ ∣Y∣)
+    _+̃_ = 𝒥.₀ (∣X∣ + ∣Y∣)
 
   ⊥̃ : Algebra
-  ⊥̃ = 𝒥.₀ ⊥ꟲ
+  ⊥̃ = 𝒥.₀ ⊥
 
   module _ {X : Algebra} where
     private
       module X = Algebra X
 
     ¡̃ : (⊥̃ ⇒̃ X)
-    ¡̃ = plain (X.action ∘ T₁ ¡ꟲ)
+    ¡̃ = plain (X.action ∘ T₁ ¡)
 
   -- (weak) eta rule for the empty type
   η̃₀ : id∼ {⊥̃} ≈̃ ¡̃ {⊥̃}
   η̃₀ = let open 𝒞.HomReasoning in begin
-    𝒞.id {T₀ ⊥ꟲ}
+    𝒞.id {T₀ ⊥}
       -- unit law of monad (join ∘ T point ≈ id)
       ≈˘⟨ T.identityˡ ⟩
-    join ⊥ꟲ ∘ T₁ (point ⊥ꟲ)
+    join ⊥ ∘ T₁ (point ⊥)
       -- uniqueness of underlying initial obj.
-      ≈˘⟨ ∘-resp-≈ʳ (T₁-resp-≈ (¡-unique (point ⊥ꟲ))) ⟩
-    join ⊥ꟲ ∘ T₁ ¡ꟲ
+      ≈˘⟨ ∘-resp-≈ʳ (T₁-resp-≈ (¡-unique (point ⊥))) ⟩
+    join ⊥ ∘ T₁ ¡
       ∎
 
   module _ {X Y : Algebra} where
@@ -239,10 +237,10 @@ module Cocartesian∼ (cocartesianꟲ : Cocartesian 𝒞) where
       ∣X∣ = X.A ; ∣Y∣ = Y.A
 
     ĩ₁ : X ⇒̃ X +̃ Y
-    ĩ₁ = plain (point (∣X∣ +ꟲ ∣Y∣) ∘ i₁)
+    ĩ₁ = plain (point (∣X∣ + ∣Y∣) ∘ i₁)
 
     ĩ₂ : Y ⇒̃ X +̃ Y
-    ĩ₂ = plain (point (∣X∣ +ꟲ ∣Y∣) ∘ i₂)
+    ĩ₂ = plain (point (∣X∣ + ∣Y∣) ∘ i₂)
 
     module _ {Z : Algebra} where
       private
@@ -254,11 +252,11 @@ module Cocartesian∼ (cocartesianꟲ : Cocartesian 𝒞) where
     -- (weak) eta rule for sum types
     η̃₊ :  id∼ {X +̃ Y} ≈̃ [ ĩ₁ , ĩ₂ ]∼
     η̃₊ = let open 𝒞.HomReasoning in begin
-      𝒞.id {T₀ (∣X∣ +ꟲ ∣Y∣)}
+      𝒞.id {T₀ (∣X∣ + ∣Y∣)}
         -- unit law of the monad (join ∘ T point ≈ id)
         -- obs. identical to η̃₀
         ≈˘⟨ T.identityˡ ⟩
-      join _ ∘ T₁ (point (∣X∣ +ꟲ ∣Y∣))
+      join _ ∘ T₁ (point (∣X∣ + ∣Y∣))
         -- uniqueness of underlying coproduct
         ≈˘⟨ ∘-resp-≈ʳ (T₁-resp-≈ (+-unique Equiv.refl Equiv.refl)) ⟩
       join _ ∘ T₁ [ point _ ∘ i₁ , point _ ∘ i₂ ]
@@ -280,19 +278,19 @@ module Cocartesian∼ (cocartesianꟲ : Cocartesian 𝒞) where
     -- permutation conversions for the empty type
     π̃₀ᴱ : h ∘̃ ¡̃ {Z} ≈̃ ¡̃ {Z'}
     π̃₀ᴱ = let open 𝒞.HomReasoning in begin
-      ∣h∣ ∘ Z.action ∘ T₁ ¡ꟲ
+      ∣h∣ ∘ Z.action ∘ T₁ ¡
         ≈⟨ sym-assoc ⟩
-      (∣h∣ ∘ Z.action) ∘ T₁ ¡ꟲ
+      (∣h∣ ∘ Z.action) ∘ T₁ ¡
         -- algebra homomorphism
         ≈⟨ ∘-resp-≈ˡ ∣h∣-hom ⟩
-      (Z'.action ∘ T₁ ∣h∣) ∘ T₁ ¡ꟲ
+      (Z'.action ∘ T₁ ∣h∣) ∘ T₁ ¡
         ≈⟨ assoc ⟩
-      Z'.action ∘ T₁ ∣h∣ ∘ T₁ ¡ꟲ
+      Z'.action ∘ T₁ ∣h∣ ∘ T₁ ¡
         ≈˘⟨ ∘-resp-≈ʳ homomorphism ⟩
-      Z'.action ∘ T₁ (∣h∣ ∘ ¡ꟲ)
+      Z'.action ∘ T₁ (∣h∣ ∘ ¡)
         -- uniqueness of initial obj.
-        ≈˘⟨ ∘-resp-≈ʳ (T₁-resp-≈ (¡-unique (∣h∣ ∘ ¡ꟲ))) ⟩
-      Z'.action ∘ T₁ ¡ꟲ
+        ≈˘⟨ ∘-resp-≈ʳ (T₁-resp-≈ (¡-unique (∣h∣ ∘ ¡))) ⟩
+      Z'.action ∘ T₁ ¡
         ∎
 
     module _ {X Y : Algebra} (f : X ⇒̃ Z) (g : Y ⇒̃ Z) where
@@ -318,3 +316,30 @@ module Cocartesian∼ (cocartesianꟲ : Cocartesian 𝒞) where
           ≈⟨ ∘-resp-≈ʳ (T₁-resp-≈ ∘-distribˡ-[]) ⟩
         Z'.action ∘ T₁ [ ∣h∣ ∘ ∣f∣ , ∣h∣ ∘ ∣g∣ ]
           ∎
+
+open import Categories.Category.Monoidal.Core
+open import Categories.Category.Cartesian.Monoidal
+
+module ModeratelyDistributive∼
+  (distributive : Distributive 𝒞)
+  (let open Distributive distributive)
+  (let open CartesianMonoidal cartesian using (monoidal))
+  (strength : Strength monoidal T) where
+
+  open Strength strength renaming (strengthen to θ)
+  str = θ.η
+
+  -- my modules
+  open Cartesian∼ cartesian
+  open ModeratelyCocartesian∼ cocartesian
+
+  open Cartesian cartesian∼ using () renaming (_×₁_ to _×̃₁_)
+
+  module _ {X Y Z : Algebra} where
+      private
+        module X = Algebra X ; ∣X∣ = X.A
+        module Y = Algebra Y ; ∣Y∣ = Y.A
+        module Z = Algebra Z ; ∣Z∣ = Z.A
+
+      ×̃-distr-+̃ : X ×̃ (Y +̃ Z) ⇒̃ (X ×̃ Y) +̃ (X ×̃ Z)
+      ×̃-distr-+̃ = plain (T₁ distributeˡ⁻¹ ∘ str (∣X∣ , ∣Y∣ + ∣Z∣))

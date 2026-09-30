@@ -18,7 +18,10 @@ module Category = LCategory
 open import Categories.Functor using (Functor; Endofunctor; _∘F_) renaming (id to idF) public
 
 open import Categories.Category.Cartesian public
+open import Categories.Category.CartesianClosed public
 open import Categories.Category.Cocartesian public
 open import Categories.Category.Distributive public
 
 open import Categories.Morphism public
+
+open import Categories.NaturalTransformation.Core using (NaturalTransformation) public 

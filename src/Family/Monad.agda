@@ -35,8 +35,8 @@ record 𝒞𝒮 : Set₁ where
 
     -- "kleisli laws"
     trans-assoc      : (f : 𝒬 →̇ 𝒞₀ ℛ) (g : 𝒫 →̇ 𝒞₀ 𝒬) → trans (trans f ∘' g) ≈̇ trans f ∘' trans g
-    trans-unit-left  : trans {𝒫} iden ≈̇ id'
-    trans-unit-right : (f : 𝒫 →̇ 𝒞₀ 𝒬) → trans f ∘' iden ≈̇ f
+    trans-unit-right : trans {𝒫} iden ≈̇ id'
+    trans-unit-left  : (f : 𝒫 →̇ 𝒞₀ 𝒬) → trans f ∘' iden ≈̇ f
 
   𝒞₁ : 𝒫 →̇ 𝒬 → 𝒞₀ 𝒫 →̇ 𝒞₀ 𝒬
   𝒞₁ f = trans (iden ∘' f)
@@ -45,7 +45,7 @@ record 𝒞𝒮 : Set₁ where
   𝒞₁-pres-≈ f≈f' = trans-pres-≈ (∘'-pres-≈̇-right iden f≈f')
 
   𝒞₁-pres-id : 𝒞₁ (id' {𝒫}) ≈̇ id'
-  𝒞₁-pres-id {𝒫} = ≈̇-trans (trans-pres-≈ (∘'-unit-right 𝒫 iden)) trans-unit-left
+  𝒞₁-pres-id {𝒫} = ≈̇-trans (trans-pres-≈ (∘'-unit-right 𝒫 iden)) trans-unit-right
 
   𝒞₁-pres-∘' : (f : 𝒫 →̇ 𝒬) (g : 𝒬 →̇ ℛ) → 𝒞₁ (g ∘' f) ≈̇ 𝒞₁ g ∘' 𝒞₁ f
   𝒞₁-pres-∘' f g = let open EqReasoning (→̇-setoid _ _) in begin
@@ -54,7 +54,7 @@ record 𝒞𝒮 : Set₁ where
     trans (iden ∘' g ∘' f)
       ≈˘⟨ trans-pres-≈ (∘'-assoc iden g f) ⟩
     trans ((iden ∘' g) ∘' f)
-      ≈˘⟨ trans-pres-≈ (∘'-pres-≈̇-left (trans-unit-right (iden ∘' g)) f) ⟩
+      ≈˘⟨ trans-pres-≈ (∘'-pres-≈̇-left (trans-unit-left (iden ∘' g)) f) ⟩
     trans ((trans (iden ∘' g) ∘' iden) ∘' f)
       ≈⟨ trans-pres-≈ (∘'-assoc (trans (iden ∘' g)) iden f) ⟩
     trans (trans (iden ∘' g) ∘' iden ∘' f)
@@ -65,15 +65,7 @@ record 𝒞𝒮 : Set₁ where
       ∎
 
   trans-natʳ : (f : 𝒬 →̇ 𝒬') (g : 𝒫 →̇ 𝒞₀ 𝒬) → 𝒞₁ f ∘' trans g ≈̇ trans (𝒞₁ f ∘' g)
-  trans-natʳ f g = let open EqReasoning (→̇-setoid _ _) in begin
-    𝒞₁ f ∘' trans g
-      ≡⟨⟩
-    trans (iden ∘' f) ∘' trans g
-      ≈˘⟨ trans-assoc (iden ∘' f) g ⟩
-    trans (trans (iden ∘' f) ∘' g)
-      ≡⟨⟩
-    trans (𝒞₁ f ∘' g)
-      ∎
+  trans-natʳ f g = ≈̇-sym (trans-assoc (iden ∘' f) g)
 
   trans-natˡ : (f : 𝒫' →̇ 𝒫) (g : 𝒫 →̇ 𝒞₀ 𝒬) → trans g ∘' 𝒞₁ f ≈̇ trans (g ∘' f)
   trans-natˡ f g = let open EqReasoning (→̇-setoid _ _) in begin
@@ -84,7 +76,7 @@ record 𝒞𝒮 : Set₁ where
     trans (trans g ∘' iden ∘' f)
       ≈˘⟨ trans-pres-≈ (∘'-assoc (trans g) iden f) ⟩
     trans ((trans g ∘' iden) ∘' f)
-      ≈⟨ trans-pres-≈ (∘'-pres-≈̇-left (trans-unit-right g) f) ⟩
+      ≈⟨ trans-pres-≈ (∘'-pres-≈̇-left (trans-unit-left g) f) ⟩
     trans (g ∘' f)
       ∎
 
@@ -99,7 +91,7 @@ record 𝒞𝒮 : Set₁ where
     𝒞₁ f ∘' point
       ≡⟨⟩
     trans (point ∘' f) ∘' point
-      ≈⟨ trans-unit-right (point ∘' f) ⟩
+      ≈⟨ trans-unit-left (point ∘' f) ⟩
     point ∘' f
       ∎
 
@@ -109,7 +101,7 @@ record 𝒞𝒮 : Set₁ where
   join[_] : ∀ 𝒫 → 𝒞₀ (𝒞₀ 𝒫) →̇ 𝒞₀ 𝒫
   join[ 𝒫 ] = join
 
-  join-natural : (f : 𝒫 →̇ 𝒬) → join[ 𝒬 ] ∘' (𝒞₁ (𝒞₁ f)) ≈̇ 𝒞₁ f ∘' join[ 𝒫 ]
+  join-natural : (f : 𝒫 →̇ 𝒬) → join[ 𝒬 ] ∘' 𝒞₁ (𝒞₁ f) ≈̇ 𝒞₁ f ∘' join[ 𝒫 ]
   join-natural {𝒫} {𝒬} f = let open EqReasoning (→̇-setoid _ _) in begin
     join[ 𝒬 ] ∘' (𝒞₁ (𝒞₁ f))
       ≡⟨⟩
@@ -126,7 +118,7 @@ record 𝒞𝒮 : Set₁ where
     𝒞₁ f ∘' join[ 𝒫 ]
       ∎
 
-  join-assoc : join[ 𝒫 ] ∘' (𝒞₁ join[ 𝒫 ]) ≈̇ join[ 𝒫 ] ∘' join[ 𝒞₀ 𝒫 ]
+  join-assoc : join[ 𝒫 ] ∘' 𝒞₁ join[ 𝒫 ] ≈̇ join[ 𝒫 ] ∘' join[ 𝒞₀ 𝒫 ]
   join-assoc {𝒫} = let open EqReasoning (→̇-setoid _ _) in begin
     join[ 𝒫 ] ∘' 𝒞₁ join[ 𝒫 ]
       ≡⟨⟩
@@ -141,4 +133,26 @@ record 𝒞𝒮 : Set₁ where
     trans id' ∘' trans id'
       ≡⟨⟩
     join[ 𝒫 ] ∘' join[ 𝒞₀ 𝒫 ]
+      ∎
+
+  join-unit-left : join[ 𝒫 ] ∘' point[ 𝒞₀ 𝒫 ] ≈̇ id'[ 𝒞₀ 𝒫 ]
+  join-unit-left {𝒫} = trans-unit-left id'
+
+  join-unit-right : join[ 𝒫 ] ∘' 𝒞₁ point[ 𝒫 ] ≈̇ id'[ 𝒞₀ 𝒫 ]
+  join-unit-right {𝒫} = let open EqReasoning (→̇-setoid _ _) in begin
+    join ∘' 𝒞₁ point
+      ≡⟨⟩
+    trans id' ∘' trans (iden ∘' iden)
+      ≈˘⟨ ∘'-pres-≈̇-left (trans-pres-≈ trans-unit-right) (trans (iden ∘' iden)) ⟩
+    trans (trans iden) ∘' trans (iden ∘' iden)
+      ≈˘⟨ trans-assoc (trans iden) (iden ∘' iden) ⟩
+    trans (trans (trans iden) ∘' iden ∘' iden)
+      ≈˘⟨ trans-pres-≈ (∘'-assoc (trans (trans iden)) iden iden) ⟩
+    trans ((trans (trans iden) ∘' iden) ∘' iden)
+      ≈⟨ trans-pres-≈ (∘'-pres-≈̇-left (trans-unit-left (trans iden)) iden) ⟩
+    trans (trans iden ∘' iden)
+      ≈⟨ trans-pres-≈ (trans-unit-left iden) ⟩
+    trans iden
+      ≈⟨ trans-unit-right ⟩
+    id'[ 𝒞₀ 𝒫 ]
       ∎

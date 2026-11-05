@@ -1,3 +1,5 @@
+{-# OPTIONS --safe --without-K #-}
+
 module Algebra.Lib where
 
 open import Function using () renaming (id to idᶠ ; _∘_ to _∘ᶠ_) public
@@ -14,6 +16,9 @@ open import Categories.Monad.Strong public
 
 Category = LCategory 0ℓ 0ℓ 0ℓ
 module Category = LCategory
+
+Category₁ = LCategory (suc 0ℓ) 0ℓ 0ℓ
+module Category₁ = LCategory
 
 open import Categories.Functor using (Functor; Endofunctor; _∘F_) renaming (id to idF) public
 

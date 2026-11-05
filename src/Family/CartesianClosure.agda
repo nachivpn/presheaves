@@ -22,6 +22,8 @@ open import Relation.Binary using (Reflexive; Symmetric; Transitive; IsEquivalen
 open import Relation.Binary.PropositionalEquality.Properties using () renaming (isEquivalence to ≡-equiv)
 import Relation.Binary.Reasoning.Setoid as EqReasoning
 
+open import Algebra.Lib
+
 private
   variable
     w v              : W
@@ -213,7 +215,7 @@ module _ {𝒫 𝒬 : Psh} where
   app' : (t : ℛ →̇ 𝒫 →' 𝒬) → (u : ℛ →̇ 𝒫) → ℛ →̇ 𝒬
   app' {ℛ} t u = record
     { fun     = λ r → t .apply r .apply (u .apply r)
-    ; pres-≋  = λ r≋r' → →'-≋-apply-sq (t .apply-≋ r≋r') (u .apply-≋ r≋r')        
+    ; pres-≋  = λ r≋r' → →'-≋-apply-sq (t .apply-≋ r≋r') (u .apply-≋ r≋r')
     }
 
   opaque
@@ -233,7 +235,7 @@ lam' : (t : ℛ ×' 𝒫 →̇ 𝒬) → ℛ →̇ 𝒫 →' 𝒬
 lam' {ℛ} {𝒫} {𝒬} t = record
   { fun     = λ r → record
                 { fun     = λ p → t .apply (elem (r , p))
-                ; pres-≋  = λ p≋p' → t .apply-≋ (proof (≋[ ℛ ]-refl , p≋p'))                    
+                ; pres-≋  = λ p≋p' → t .apply-≋ (proof (≋[ ℛ ]-refl , p≋p'))
                 }
   ; pres-≋  = λ r≋r' → proof λ p → t .apply-≋ (proof (r≋r' , ≋[ 𝒫 ]-refl))
   }
@@ -247,3 +249,49 @@ opaque
 
   →'-eta : ∀ (t : ℛ →̇ 𝒫 →' 𝒬) → t ≈̇ lam' {𝒬 = 𝒬} (app' (t [ π₁'[ 𝒫 ] ]') π₂'[ ℛ ])
   →'-eta {ℛ} {𝒫} {𝒬} t = proof-≈̇ λ r → proof (λ p → ≋[ 𝒬 ]-refl)
+
+
+
+𝒲̂-cartesian : Cartesian 𝒲̂
+𝒲̂-cartesian = record
+  { terminal = record
+    { ⊤             = ⊤'
+    ; ⊤-is-terminal = record { ! = unit' ; !-unique = λ _ → ≈̇-sym (⊤'-eta) }
+    }
+  ; products =  record
+    { product = λ {𝒫} {𝒬} → record
+      { A×B      = 𝒫 ×' 𝒬
+      ; π₁       = π₁'
+      ; π₂       = π₂'
+      ; ⟨_,_⟩    = ⟨_,_⟩'
+      ; project₁ = λ {_} {h} {i} → ×'-beta-left i
+      ; project₂ = λ {_} {h} {i} → ×'-beta-right h
+      ; unique   = λ p q → ≈̇-sym (≈̇-trans ×'-eta (pair'-pres-≈̇ p q))
+      }
+    }
+  }
+
+𝒲̂-closed : CartesianClosed 𝒲̂
+𝒲̂-closed = record
+  { cartesian = 𝒲̂-cartesian
+  ; exp = λ {𝒫} {𝒬} → record
+    { B^A      = 𝒫 →' 𝒬
+    ; eval     = app' π₁' π₂'
+    ; λg       = lam'
+    ; β        = →'-beta′
+    ; λ-unique = →'-eta′
+    }
+  }
+  where
+    eval' : (𝒫 →' 𝒬) ×' 𝒫 →̇ 𝒬
+    eval' = app' π₁' π₂'
+
+    -- Note: The laws below could be derived from →'-beta and →'-eta
+    -- but the proofs seem a bit lengthy and require additional lemmas.
+    -- I'll avoid it as it might also slow down typechecking.
+
+    →'-beta′ : {t : ℛ ×' 𝒫 →̇ 𝒬} → eval' ∘' (lam' t ×'-map id') ≈̇ t
+    →'-beta′ {𝒬 = 𝒬} = proof-≈̇ (λ { (elem (p , q)) → ≋[ 𝒬 ]-refl })
+
+    →'-eta′ : {g : ℛ ×' 𝒫 →̇ 𝒬} {h : ℛ →̇ (𝒫 →' 𝒬)} → eval' ∘' (h ×'-map id') ≈̇ g → h ≈̇ lam' g
+    →'-eta′ eq = proof-≈̇ (λ p → proof λ q → apply-≈̇ eq (elem (p , q)))

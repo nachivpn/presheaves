@@ -13,6 +13,8 @@ open import Relation.Binary using (Reflexive; Symmetric; Transitive; IsEquivalen
 open import Relation.Binary.PropositionalEquality.Properties using () renaming (isEquivalence to ≡-equiv)
 import Relation.Binary.Reasoning.Setoid as EqReasoning
 
+open import Algebra.Lib -- categories
+
 infixr 19 _∘'_
 infix  18 _→̇_ _≈̇_
 
@@ -202,3 +204,19 @@ opaque
 
   ∘'-unit-right : ∀ (𝒫 : Psh) {𝒬 : Psh} (φ : 𝒫 →̇ 𝒬) → φ ∘' id'[ 𝒫 ] ≈̇ φ
   ∘'-unit-right _ {𝒬} _ = proof-≈̇ (λ p → ≋[ 𝒬 ]-refl)
+
+𝒲̂ : Category₁
+𝒲̂ = record
+  { Obj       = Psh
+  ; _⇒_       = _→̇_
+  ; _≈_       = _≈̇_
+  ; id        = id'
+  ; _∘_       = _∘'_
+  ; assoc     = ∘'-assoc _ _ _
+  ; sym-assoc = ≈̇-sym (∘'-assoc _ _ _)
+  ; identityˡ = ∘'-unit-left _ _
+  ; identityʳ = ∘'-unit-right _ _
+  ; identity² = ∘'-unit-left _ _
+  ; equiv     = ≈̇-equiv
+  ; ∘-resp-≈  = ∘'-pres-≈̇
+  }
